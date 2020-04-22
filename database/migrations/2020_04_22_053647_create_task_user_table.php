@@ -15,8 +15,10 @@ class CreateTaskUserTable extends Migration
     {
         Schema::create('task_user', function (Blueprint $table) {
             $table->id();
-            $table->integer('task_id')->unsigned();
-            $table->integer('user_id')->unsigned();
+            $table->foreignId('task_id');
+            $table->foreignId('user_id');
+            $table->boolean('confirmed');
+            $table->text('report')->nullable();
             $table->timestamps();
         });
     }

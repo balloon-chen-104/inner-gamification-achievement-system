@@ -13,10 +13,10 @@ class Group extends Model
         return $this->belongsToMany('App\User');
     }
 
-    // public function creator()
-    // {
-    //     return $this->hasOne('App\User', 'creator_id');
-    // }
+    public function creator()
+    {
+        return $this->belongsTo('App\User', 'creator_id');
+    }
 
     public function category()
     {

@@ -10,4 +10,9 @@ class Category extends Model
     {
         return $this->hasMany('App\Group');
     }
+
+    public function tasks()
+    {
+        return $this->hasMany('App\Task');
+    }
 }

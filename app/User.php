@@ -46,4 +46,14 @@ class User extends Authenticatable
     {
         return $this->belongsToMany('App\Group');
     }
+
+    public function createdGroups()
+    {
+        return $this->hasMany('App\Group', 'creator_id');
+    }
+
+    public function createdTasks()
+    {
+        return $this->hasMany('App\Task', 'creator_id');
+    }
 }
