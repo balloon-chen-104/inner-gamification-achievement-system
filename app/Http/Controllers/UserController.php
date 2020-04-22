@@ -70,11 +70,12 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $oldUser = User::find($id);
-        $oldUser->active_group = $request->active_group;
-        $oldUser->save();
-        activeGroup($request->active_group);
-        return Redirect::to("home");
+        if(isset($request->active_group)){
+            $oldUser = User::find($id);
+            $oldUser->active_group = $request->active_group;
+            $oldUser->save();
+            return Redirect::to("/");
+        }
     }
 
     /**

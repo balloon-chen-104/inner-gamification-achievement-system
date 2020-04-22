@@ -37,7 +37,19 @@
 
                 <ul class="list-unstyled components">
                     @foreach (Auth::user()->groups as $group)
-                        <li @if($group->id == Auth::user()->active_group) echo class="active" @endif>
+                        <li @if($group->id == Auth::user()->active_group) class="active" @endif>
+                            
+                            {{-- Check if user is admin --}}
+                            @if($group->id == Auth::user()->active_group)
+                                @php
+                                    if($group->pivot->authority){
+                                        $isAdmin = true;
+                                    } else{
+                                        $isAdmin = false;
+                                    }
+                                @endphp
+                            @endif
+                            
                             <a id="group_{{ $group->id }}" href="#"
                                onclick="event.preventDefault();
                                         document.getElementById('active-group-form-{{ $group->id }}').submit();">
@@ -53,13 +65,12 @@
                     @endforeach
                 </ul>
 
-                <?php echo '目前的 session group_id 是 ' . $_SESSION['group_id']; ?>
-
                 <ul class="list-unstyled CTAs">
                     @guest
                     @else
                         <li>
-                            <a href="https://bootstrapious.com/tutorial/files/sidebar.zip" class="download">建立 / 加入群組</a>
+                            <a href="#" class="download">建立群組</a>
+                            <a href="#" class="download">加入群組</a>
                         </li>
                         <li>
                             <a class="article" href="{{ route('logout') }}"
@@ -106,31 +117,6 @@
                     <div class="collapse navbar-collapse" id="navbarSupportedContent">
                         <!-- Right Side Of Navbar -->
                         <ul class="navbar-nav ml-auto">
-
-
-                            
-
-
-
-                            {{-- <a class="article" href="{{ route('logout') }}"
-                                onclick="event.preventDefault();
-                                                document.getElementById('logout-form').submit();">
-                                {{ __('登出') }}
-                            </a>
-
-                            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                                @csrf
-                            </form>
-
-
-
-
-                            @if (false)
-                                <?php hello(); ?>
-                            @endif --}}
-
-
-
                             <!-- Authentication Links -->
                             @guest
                                 <li class="nav-item">
@@ -142,20 +128,28 @@
                                     </li>
                                 @endif
                             @else
+                                @if (isset($isAdmin))
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#">{{ __('佈告欄') }}</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#">{{ __('任務表') }}</a>
+                                    </li>
+                                    @if ($isAdmin)
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="#">{{ __('成員數據') }}</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="#">{{ __('設定') }}</a>
+                                        </li>
+                                    @else
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="#">{{ __('排行榜') }}</a>
+                                        </li>
+                                    @endif
+                                @endif
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('register') }}">{{ __('佈告欄') }}</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('register') }}">{{ __('任務表') }}</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('register') }}">{{ __('成員數據') }}</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('register') }}">{{ __('設定') }}</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('register') }}">{{ Auth::user()->name }}</a>
+                                    <a class="nav-link" href="#">{{ Auth::user()->name }}</a>
                                 </li>
                             @endguest
                         </ul>

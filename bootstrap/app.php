@@ -1,10 +1,5 @@
 <?php
 
-use App\Group;
-
-// require helpers
-require_once '../resources/helpers/session_helper.php';
-
 /*
 |--------------------------------------------------------------------------
 | Create The Application
