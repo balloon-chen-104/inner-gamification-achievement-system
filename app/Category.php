@@ -6,9 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Category extends Model
 {
-    public function groups()
+    public function group()
     {
-        return $this->hasMany('App\Group');
+        return $this->belongsTo('App\Group');
     }
 
     public function tasks()

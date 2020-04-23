@@ -18,8 +18,8 @@ class Group extends Model
         return $this->belongsTo('App\User', 'creator_id');
     }
 
-    public function category()
+    public function categories()
     {
-        return $this->belongsTo('App\Category');
+        return $this->hasMany('App\Category');
     }
 }
