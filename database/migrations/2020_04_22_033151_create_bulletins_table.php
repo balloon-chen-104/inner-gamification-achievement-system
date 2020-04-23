@@ -17,6 +17,7 @@ class CreateBulletinsTable extends Migration
             $table->id();
             $table->enum('type', ['announcement', 'flash_message']);
             $table->string('content');
+            $table->boolean('flash_message_switch');
             $table->foreignId('user_id');
             $table->foreignId('group_id');
             $table->timestamps();

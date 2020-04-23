@@ -17,7 +17,6 @@ class CreateSettingsTable extends Migration
             $table->id();
             $table->integer('cycle')->nullable();
             $table->date('started_at');
-            $table->boolean('flash_message_switch');
             $table->foreignId('group_id');
             $table->timestamps();
         });

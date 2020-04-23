@@ -18,3 +18,12 @@ Auth::routes();
 Route::get('/', 'HomeController@index')->name('home');
 
 Route::resource('/users', 'UserController');
+
+Route::get('/setting', 'SettingController@index');
+
+Route::get('/setting/editCycle', 'SettingController@editCycle');
+Route::put('/setting/updateCycle', 'SettingController@updateCycle');
+
+Route::get('setting/{id}/editFlashMessage', 'SettingController@editFlashMessage');
+Route::put('setting/{id}/updateFlashMessage', 'SettingController@updateFlashMessage');
+Route::delete('setting/{id}/destroyFlashMessage', 'SettingController@destroyFlashMessage');
