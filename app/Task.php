@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Task extends Model
 {
     protected $fillable = [];
+    protected $hidden = ['category_id', 'creator_id'];
 
     public function users()
     {
