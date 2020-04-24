@@ -50,14 +50,15 @@ class TaskController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Display the history tasks.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function history()
     {
-        //
+        $active_group = auth()->user()->active_group;
+        return view('task.task')->withGroup(Group::find($active_group));
     }
 
     /**

@@ -1,22 +1,22 @@
+@auth
 <div class="modal fade" id="addGroupModalCenter" tabindex="-1" role="dialog" aria-labelledby="addGroupModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="addGroupModalCenterTitle">新增群組</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
+            <button type="button" id="addGroupModal-close" class="close" data-dismiss="modal" aria-label="Close">
             </button>
             </div>
-            <form action="/" method="POST">
+            <form id="add-group-form" method="POST">
                 @csrf
                 <div class="modal-body">
                     <div class="form-group">
                         <label for="name">群組名稱</label>
-                        <input type="text" name="name" id="name" class="form-control" required>
+                        <input type="text" name="name" id="group-name" class="form-control" required>
                     </div>
                     <div class="form-group">
                         <label for="name">群組描述</label>
-                        <input type="text" name="name" id="name" class="form-control" required>
+                        <input type="text" name="name" id="group-description" class="form-control" required>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -27,3 +27,53 @@
         </div>
     </div>
 </div>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+<script>
+$(document).ready(() => {
+    $("#add-group-form").submit((event) => {
+        event.preventDefault();
+        addGroup();
+    });
+});
+function addGroup(){
+    const data = {
+        'name': $('#group-name').val(),
+        'description': $('#group-description').val(),
+    };
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+            'authorization': `Bearer {{Auth::user()->api_token}}`
+        }
+    });
+    $.ajax({
+        type: "POST",
+        contentType: "application/json",
+        url: `/api/v1/group`,
+        dataType: 'json',
+        data: JSON.stringify(data),
+        success: (result) => {
+            const group = result.data
+            $('.components').append(`
+                <li>
+                    <a id="group_${group.id}" href="#"
+                    onclick="event.preventDefault();
+                        document.getElementById('active-group-form-${group.id}').submit();">
+                        ${group.name}
+                    </a>
+                    <form id="active-group-form-${group.id}" action="users/{{Auth::user()->id}}" method="POST" style="display: none;">
+                        <input type="text" name="active_group" value="${group.id}">
+                        @method('PUT')
+                        @csrf
+                    </form>
+                </li>`);
+            $('#addGroupModalCenter').modal('toggle');
+        },
+        error: (e) => {
+            console.log("ERROR: ", e);
+            $('#addGroupModalCenter').modal('toggle');
+        },
+    });
+}
+</script>
+@endauth

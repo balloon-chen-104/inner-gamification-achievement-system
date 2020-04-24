@@ -6,10 +6,25 @@
     <div class="row justify-content-center">
         <div class="col-md-10">
             <div class="card">
+                <div class="card-header">群組ID</div>
+                <div class="card-body">
+                    {{\App\Group::find(Auth::user()->active_group)->first()->group_token}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<br>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card">
                 <div class="card-header">佈告欄週期設定</div>
 
                 <div class="card-body">
- 
+
                     <p class="text-dark">週期：{{ $data['cycle'] }}天&nbsp&nbsp&nbsp<a href="/setting/editCycle" class="btn btn-secondary btn-sm">修改</a></p>
                     <p class="text-dark">起始日：{{ $data['started_at'] }}</p>
                     @php

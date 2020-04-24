@@ -5,10 +5,9 @@
         <div class="col-md-8">
 
             <div class="card">
-                <div class="card-header">任務欄</div>
+                <div class="card-header">已完成的任務</div>
                 <div class="card-body">
 
-                    {{-- <p>任務種類</p> --}}
                     <div class="float-right input-group mb-3" style="width:25ch">
                         <div class="input-group-prepend">
                             <label class="input-group-text" for="catInputGroupSelect">任務種類</label>
@@ -49,13 +48,5 @@
         </div>
     </div>
 </div>
-@include('inc.reportTask')
-<script>
-    function getTask() {
-        const task = {!! $task ?? null !!}
-        $('#task-name').empty();
-        $('#task-name').append(task.name);
-        $('#task-id').val(task.id);
-    }
-</script>
 @endsection
+

@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
 Auth::routes();
 
 Route::get('/', 'HomeController@index')->name('home');
@@ -43,4 +42,8 @@ Route::get('/testFlashMessage', function()
     return view('testApi.testFlashMessageApi');
 });
 
-Route::resource('task', 'TaskController');
+Route::prefix('task')->name('task.')->group(function() {
+    Route::get('/', 'TaskController@index')->name('index');
+    Route::get('/edit', 'TaskController@create')->name('edit');
+    Route::get('/history', 'TaskController@history')->name('history');
+});

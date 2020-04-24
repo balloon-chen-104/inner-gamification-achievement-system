@@ -69,7 +69,7 @@
                                 {{ $group->name }}
                             </a>
 
-                            <form id="active-group-form-{{ $group->id }}" action="users/{{Auth::user()->id}}" method="POST" style="display: none;">
+                            <form id="active-group-form-{{ $group->id }}" action="/users/{{Auth::user()->id}}" method="POST" style="display: none;">
                                 <input type="text" name="active_group" value="{{ $group->id }}">
                                 @method('PUT')
                                 @csrf
@@ -82,8 +82,8 @@
                     @guest
                     @else
                         <li>
-                            <a href="#" class="download" data-toggle="modal" data-target="#addGroupModalCenter">建立群組</a>
-                            <a href="#" class="download" data-toggle="modal" data-target="#enterGroupModalCenter">加入群組</a>
+                            <a href="#" class="download" onclick="$('#addGroupModalCenter').modal('toggle')">建立群組</a>
+                            <a href="#" class="download" onclick="$('#enterGroupModalCenter').modal('toggle')">加入群組</a>
                         </li>
                         <li>
                             <a class="article" href="{{ route('logout') }}"
@@ -146,12 +146,26 @@
                                         <a class="nav-link" href="/bulletin">{{ __('佈告欄') }}</a>
                                     </li>
                                     <li class="nav-item dropdown">
-                                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">{{ __('任務') }}</a>
+                                        <a class="nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">{{ __('任務') }}</a>
                                         <div class="dropdown-menu">
-                                          <a class="dropdown-item" href="/task">所有任務</a>
-                                          <a class="dropdown-item" href="#">已完成任務</a>
-                                          {{-- <div class="dropdown-divider"></div>
-                                          <a class="dropdown-item" href="#">Separated link</a> --}}
+                                            <a class="dropdown-item" href="/task">所有任務</a>
+                                            <a class="dropdown-item" href="{{route('task.history')}}">過去的任務</a>
+                                            <div class="dropdown-divider"></div>
+                                            @php
+                                                $authority = 0;
+                                                foreach(\App\Group::find(Auth::user()->active_group)->users as $group_user){
+                                                    if($group_user->pivot->user_id == Auth::user()->id){
+                                                        $autority = $group_user->pivot->authority;
+                                                    }
+                                                }
+                                            @endphp
+                                            @if($authority == 1)
+                                                <a class="dropdown-item" href="#">新增／修改任務</a>
+                                                <a class="dropdown-item" href="#">審核員工完成任務</a>
+                                            @else
+                                                <a class="dropdown-item" href="#">提案新任務</a>
+                                            @endif
+
                                     </li>
                                     @if ($isAdmin)
                                         <li class="nav-item">

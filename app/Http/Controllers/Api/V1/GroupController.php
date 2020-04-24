@@ -18,7 +18,7 @@ class GroupController extends Controller
     public function __construct(Group $group)
     {
         $this->group = $group;
-        $this->middleware('auth:api')->only(['store', 'update', 'destroy']);
+        $this->middleware('auth:api')->only(['store', 'update', 'destroy', 'enter']);
     }
     /**
      * Display a listing of the resource.
@@ -85,5 +85,19 @@ class GroupController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function enter(Request $request)
+    {
+        $request->validate([
+            'group_token' => 'required|size:5'
+        ]);
+        $token = $request->input('group_token');
+        $enter_group = $this->group->with('users')->where('group_token', $token)->first();
+        $enter_group->users()->attach(auth()->user()->id, ['authority' => 0]);
+
+        $this->updateApiToken(auth()->user());
+
+        return new GroupResource($enter_group);
     }
 }
