@@ -4,9 +4,12 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Bulletin;
+use App\Http\Controllers\Api\V1\UpdateApiToken;
 
 class FlashMessageController extends Controller
 {
+    use UpdateApiToken;
+
     public function __construct()
     {
         $this->middleware('auth:api');
@@ -25,7 +28,6 @@ class FlashMessageController extends Controller
         } else{
             $type = $request->type;
             $content = trim(htmlentities($request->content));
-            $content = $request->content;
             $user_id = auth()->user()->id;
             $group_id = auth()->user()->active_group;
             
@@ -43,7 +45,8 @@ class FlashMessageController extends Controller
                 'user_id' => $user_id,
                 'group_id' => $group_id
             ]);
-    
+
+            $this->updateApiToken(auth()->user());
             return $bulletin;
         }
     }
