@@ -140,7 +140,13 @@ class SettingController extends Controller
             }
         } else{
             $bulletin = Bulletin::find($id);
-            $bulletin->content = $request->flashMessage;
+
+            $flashMessage = trim($request->flashMessage);
+            if($flashMessage == ''){
+                return Redirect::to("setting/$id/editFlashMessage");
+            }
+
+            $bulletin->content = $flashMessage;
             $bulletin->save();
             return Redirect::to("setting");
         }

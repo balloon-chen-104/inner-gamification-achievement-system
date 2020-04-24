@@ -10,7 +10,7 @@
                 <div class="card-body">
                     
                     <form id="add_flash_message">
-                        <input type="text" id="bulletin_content" class="form-control mb-2">
+                        <input type="text" id="bulletin_content" class="form-control mb-2" required>
                         <input type="hidden" id="bulletin_type" value="flash_message">
                         <input type="submit" class="btn btn-secondary btn-sm" value="送出">
                         <a href="/setting" class="btn btn-outline-secondary btn-sm">返回</a>
