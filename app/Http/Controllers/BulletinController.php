@@ -67,7 +67,12 @@ class BulletinController extends Controller
      */
     public function store(Request $request)
     {
-        $content = $request->input('content');
+        $content = trim($request->input('content'));
+
+        if($content == ''){
+            return Redirect::to("bulletin/create");
+        }
+
         $bulletin = Bulletin::create([
             'type' => 'announcement',
             'content' => $content,
@@ -86,7 +91,12 @@ class BulletinController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $content = $request->input('content');
+        $content = trim($request->input('content'));
+
+        if($content == ''){
+            return Redirect::to("bulletin/$id/edit");
+        }
+
         $bulletin = Bulletin::find($id);
         $bulletin->content = $content;
         $bulletin->save();

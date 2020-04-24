@@ -10,7 +10,7 @@
                 <div class="card-body">
                     
                     <form action="/bulletin/{{ $bulletin->id }}" method="post">
-                        <textarea id ="bulletin-ckeditor" name="content" class="form-control form-control-lg">{{ $bulletin->content }}</textarea>
+                        <textarea id ="bulletin-ckeditor" name="content" class="form-control form-control-lg" required>{{ $bulletin->content }}</textarea>
                         <span class="invalid-feedback"></span>
                         <br>
                         <div class="d-flex justify-content-center">

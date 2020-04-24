@@ -10,7 +10,7 @@
                 <div class="card-body">
                     
                     <form action="/bulletin" method="post">
-                        <textarea id ="bulletin-ckeditor" name="content" class="form-control form-control-lg"></textarea>
+                        <textarea id ="bulletin-ckeditor" name="content" class="form-control form-control-lg" required></textarea>
                         <span class="invalid-feedback"></span>
                         <br>
                         <div class="d-flex justify-content-center">

@@ -44,3 +44,5 @@ Route::get('/testFlashMessage', function()
 });
 
 Route::resource('task', 'TaskController');
+
+Route::get('/profile', 'ProfileController@index');
