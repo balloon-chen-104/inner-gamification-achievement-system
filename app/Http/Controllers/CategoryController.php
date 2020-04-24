@@ -3,18 +3,15 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Task;
-use App\Group;
+use App\Category;
 
-class TaskController extends Controller
+class CategoryController extends Controller
 {
-    protected $task;
-    protected $group;
-    public function __construct(Task $task, Group $group)
-    {
-        $this->task = $task;
-        $this->task = $group;
+    protected $category;
 
+    public function __construct(Category $category)
+    {
+        $this->category = $category;
         $this->middleware('auth');
     }
     /**
@@ -24,8 +21,7 @@ class TaskController extends Controller
      */
     public function index()
     {
-        $active_group = auth()->user()->active_group;
-        return view('task.task')->withGroup(Group::find($active_group));
+        //
     }
 
     /**

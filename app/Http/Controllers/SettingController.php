@@ -20,7 +20,6 @@ class SettingController extends Controller
         $setting = Setting::where('group_id', Auth::user()->active_group)->get();
         $bulletin = Bulletin::where('group_id', Auth::user()->active_group)->where('type', 'flash_message')->get();
 
-
         // If expired
         $expiredDate = date_add(date_create($setting[0]->started_at), date_interval_create_from_date_string($setting[0]->cycle . 'days'));
         $expiredDateTimestamp = $expiredDate->getTimestamp();
@@ -87,7 +86,7 @@ class SettingController extends Controller
                 $setting = Setting::where('group_id', Auth::user()->active_group)->get();
                 $setting[0]->cycle = $cycle;
                 $setting[0]->save();
-        
+
                 return Redirect::to("/setting");
             }
         }
@@ -145,7 +144,7 @@ class SettingController extends Controller
     {
         $bulletin = Bulletin::find($id);
         $bulletin->delete();
-        
+
         return Redirect::to('setting');
     }
 }

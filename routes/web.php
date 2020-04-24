@@ -27,3 +27,5 @@ Route::put('/setting/updateCycle', 'SettingController@updateCycle');
 Route::get('setting/{id}/editFlashMessage', 'SettingController@editFlashMessage');
 Route::put('setting/{id}/updateFlashMessage', 'SettingController@updateFlashMessage');
 Route::delete('setting/{id}/destroyFlashMessage', 'SettingController@destroyFlashMessage');
+
+Route::resource('task', 'TaskController');

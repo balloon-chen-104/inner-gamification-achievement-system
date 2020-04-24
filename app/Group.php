@@ -10,7 +10,7 @@ class Group extends Model
 
     public function users()
     {
-        return $this->belongsToMany('App\User');
+        return $this->belongsToMany('App\User')->withPivot('authority');
     }
 
     public function creator()
@@ -21,5 +21,10 @@ class Group extends Model
     public function categories()
     {
         return $this->hasMany('App\Category');
+    }
+
+    public function tasks()
+    {
+        return $this->hasManyThrough('App\Task', 'App\Category');
     }
 }
