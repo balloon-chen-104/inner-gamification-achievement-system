@@ -1,0 +1,32 @@
+/* https://codepen.io/brissmyr/pen/egidw */
+
+/* Usage
+<a href="#" class="close"></a> */
+
+.close {
+    position: absolute;
+    right: 32px;
+    top: 14px;
+    width: 8px;
+    height: 8px;
+    opacity: 0.5;
+}
+
+.close:hover {
+    opacity: 1;
+}
+
+.close:before, .close:after {
+    position: absolute;
+    left: 15px;
+    content: ' ';
+    height: 18px;
+    width: 3px;
+    background-color: #333;
+}
+.close:before {
+    transform: rotate(45deg);
+}
+.close:after {
+    transform: rotate(-45deg);
+}

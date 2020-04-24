@@ -24,6 +24,21 @@ Route::get('/setting', 'SettingController@index');
 Route::get('/setting/editCycle', 'SettingController@editCycle');
 Route::put('/setting/updateCycle', 'SettingController@updateCycle');
 
+Route::get('/setting/createFlashMessage', 'SettingController@createFlashMessage');
 Route::get('setting/{id}/editFlashMessage', 'SettingController@editFlashMessage');
 Route::put('setting/{id}/updateFlashMessage', 'SettingController@updateFlashMessage');
 Route::delete('setting/{id}/destroyFlashMessage', 'SettingController@destroyFlashMessage');
+
+Route::get('/bulletin/create', 'BulletinController@create');
+Route::get('/bulletin/{id}/edit', 'BulletinController@edit');
+
+Route::get('/bulletin', 'BulletinController@index');
+Route::post('/bulletin', 'BulletinController@store');
+Route::put('/bulletin/{id}', 'BulletinController@update');
+Route::delete('/bulletin/{id}', 'BulletinController@destroy');
+
+// Test api
+Route::get('/testFlashMessage', function()
+{
+    return view('testApi.testFlashMessageApi');
+});

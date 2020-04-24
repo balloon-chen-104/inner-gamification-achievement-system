@@ -16,8 +16,8 @@ class CreateBulletinsTable extends Migration
         Schema::create('bulletins', function (Blueprint $table) {
             $table->id();
             $table->enum('type', ['announcement', 'flash_message']);
-            $table->string('content');
-            $table->boolean('flash_message_switch');
+            $table->text('content');
+            $table->boolean('flash_message_switch')->default(1);
             $table->foreignId('user_id');
             $table->foreignId('group_id');
             $table->timestamps();

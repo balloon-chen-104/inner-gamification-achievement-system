@@ -17,8 +17,16 @@ class SettingController extends Controller
      */
     public function index()
     {
+        // First time enter setting page without data
         $setting = Setting::where('group_id', Auth::user()->active_group)->get();
-        $bulletin = Bulletin::where('group_id', Auth::user()->active_group)->where('type', 'flash_message')->get();
+        if(!isset($setting[0])){
+            $today = date('Y-m-d');
+            $setting = Setting::create(['cycle' => 30, 'started_at' => $today, 'group_id' => Auth::user()->active_group]);
+        }
+        
+        $setting = Setting::where('group_id', Auth::user()->active_group)->get();
+        
+        $bulletin = Bulletin::where('group_id', Auth::user()->active_group)->where('type', 'flash_message')->orderBy('created_at', 'desc')->get();
 
 
         // If expired
@@ -47,7 +55,7 @@ class SettingController extends Controller
     public function editCycle()
     {
         $setting = Setting::where('group_id', Auth::user()->active_group)->get();
-        $bulletin = Bulletin::where('group_id', Auth::user()->active_group)->where('type', 'flash_message')->get();
+        $bulletin = Bulletin::where('group_id', Auth::user()->active_group)->where('type', 'flash_message')->orderBy('created_at', 'desc')->get();
         $data = [
             'cycle' => $setting[0]->cycle,
             'started_at' => $setting[0]->started_at,
@@ -102,7 +110,7 @@ class SettingController extends Controller
     public function editFlashMessage($id)
     {
         $setting = Setting::where('group_id', Auth::user()->active_group)->get();
-        $bulletin = Bulletin::where('group_id', Auth::user()->active_group)->where('type', 'flash_message')->get();
+        $bulletin = Bulletin::where('group_id', Auth::user()->active_group)->where('type', 'flash_message')->orderBy('created_at', 'desc')->get();
         $data = [
             'cycle' => $setting[0]->cycle,
             'started_at' => $setting[0]->started_at,
@@ -126,13 +134,17 @@ class SettingController extends Controller
             $bulletin = Bulletin::find($id);
             $bulletin->flash_message_switch = ($bulletin->flash_message_switch == 1) ? 0 : 1;
             $bulletin->save();
+            if($request->flash_message_switch == 'bulletin'){
+                return Redirect::to("bulletin");
+            } else{
+                return Redirect::to("setting");
+            }
         } else{
             $bulletin = Bulletin::find($id);
             $bulletin->content = $request->flashMessage;
             $bulletin->save();
+            return Redirect::to("setting");
         }
-
-        return Redirect::to("setting");
     }
 
     /**
@@ -147,5 +159,10 @@ class SettingController extends Controller
         $bulletin->delete();
         
         return Redirect::to('setting');
+    }
+
+    public function createFlashMessage()
+    {
+        return view('setting.createFlashMessage');
     }
 }

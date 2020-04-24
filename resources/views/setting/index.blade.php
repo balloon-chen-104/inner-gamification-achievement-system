@@ -35,33 +35,41 @@
                 <div class="card-body">
 
                      <table class="table table-striped table-bordered">
-                        @foreach ($data['flash_messages'] as $flash_message)
-                            <tr>
-                                <td>{{ $flash_message->content }}</td>
-                                <td>
-                                    <form id="flash_message_switch-form-{{ $flash_message->id }}" action="/setting/{{$flash_message->id}}/updateFlashMessage" method="post">
-                                        <label class="switch">
-                                            <input type="checkbox"
-                                                   @if($flash_message->flash_message_switch) checked @endif
-                                                   onchange = "document.getElementById('flash_message_switch-form-{{ $flash_message->id }}').submit();">
-                                            <span class="slider round"></span>
-                                        </label>
-                                        <input type="hidden" name="flash_message_switch" value="1">
-                                        @method('PUT')
-                                        @csrf
-                                    </form>
-                                </td>
-                                <td>
-                                    <form action="/setting/{{$flash_message->id}}/destroyFlashMessage" method="post">
-                                            <a href="/setting/{{$flash_message->id}}/editFlashMessage" class="btn btn-secondary btn-sm">編輯</a>&nbsp
-                                            <input type="submit" class="btn btn-outline-danger btn-sm" value="刪除">
-                                        @method('DELETE')
-                                        @csrf
-                                    </form>
-                                </td>
-                            </tr>
-                        @endforeach
+                        @if (count($data['flash_messages']) == 0)
+                            <p>尚無快訊</p>
+                        @else
+                            @foreach ($data['flash_messages'] as $flash_message)
+                                <tr>
+                                    <td>{{ $flash_message->content }}</td>
+                                    <td>
+                                        <form id="flash_message_switch-form-{{ $flash_message->id }}" action="/setting/{{$flash_message->id}}/updateFlashMessage" method="post">
+                                            <label class="switch">
+                                                <input type="checkbox"
+                                                    @if($flash_message->flash_message_switch) checked @endif
+                                                    onchange = "document.getElementById('flash_message_switch-form-{{ $flash_message->id }}').submit();">
+                                                <span class="slider round"></span>
+                                            </label>
+                                            <input type="hidden" name="flash_message_switch" value="1">
+                                            @method('PUT')
+                                            @csrf
+                                        </form>
+                                    </td>
+                                    <td>
+                                        <form action="/setting/{{$flash_message->id}}/destroyFlashMessage" method="post">
+                                                <a href="/setting/{{$flash_message->id}}/editFlashMessage" class="btn btn-secondary btn-sm">編輯</a>&nbsp
+                                                <input type="submit" class="btn btn-outline-danger btn-sm" value="刪除">
+                                            @method('DELETE')
+                                            @csrf
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        @endif
                     </table>
+
+                    <div class="d-flex justify-content-center">
+                        <a href="/setting/createFlashMessage" class="btn btn-secondary btn-sm">新增快訊</a>
+                    </div>
 
                 </div>
             </div>
