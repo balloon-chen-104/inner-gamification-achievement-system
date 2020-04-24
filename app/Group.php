@@ -22,4 +22,9 @@ class Group extends Model
     {
         return $this->hasMany('App\Category');
     }
+
+    public function tasks()
+    {
+        return $this->hasManyThrough('App\Task', 'App\Category');
+    }
 }

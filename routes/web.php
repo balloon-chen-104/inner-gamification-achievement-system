@@ -42,3 +42,5 @@ Route::get('/testFlashMessage', function()
 {
     return view('testApi.testFlashMessageApi');
 });
+
+Route::resource('task', 'TaskController');

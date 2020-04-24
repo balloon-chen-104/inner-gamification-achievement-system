@@ -25,7 +25,18 @@
     <!-- Font Awesome JS -->
     <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/solid.js" integrity="sha384-tzzSw1/Vo+0N5UhStP3bvwWPq+uvzCMfrN1fEFe+xBmv1C/AtVX5K0uZtmcHitFZ" crossorigin="anonymous"></script>
     <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/fontawesome.js" integrity="sha384-6OIrr52G08NpOFSZdxxz1xdNSndlD4vdcf/q2myIUVO0VsqaGHJsB0RaBE01VTOY" crossorigin="anonymous"></script>
-    
+
+    <style>
+        .dropdown-menu li:hover .sub-menu {
+            visibility: visible;
+            transition: all .8s linear;
+        }
+
+        .dropdown:hover .dropdown-menu {
+            display: block;
+            transition: all .8s linear;
+        }
+    </style>
 </head>
 <body>
     <div class="wrapper" id="app">
@@ -40,7 +51,7 @@
                 <ul class="list-unstyled components">
                     @foreach (Auth::user()->groups as $group)
                         <li @if($group->id == Auth::user()->active_group) class="active" @endif>
-                            
+
                             {{-- Check if user is admin --}}
                             @if($group->id == Auth::user()->active_group)
                                 @php
@@ -51,7 +62,7 @@
                                     }
                                 @endphp
                             @endif
-                            
+
                             <a id="group_{{ $group->id }}" href="#"
                                onclick="event.preventDefault();
                                         document.getElementById('active-group-form-{{ $group->id }}').submit();">
@@ -71,8 +82,8 @@
                     @guest
                     @else
                         <li>
-                            <a href="#" class="download">建立群組</a>
-                            <a href="#" class="download">加入群組</a>
+                            <a href="#" class="download" data-toggle="modal" data-target="#addGroupModalCenter">建立群組</a>
+                            <a href="#" class="download" data-toggle="modal" data-target="#enterGroupModalCenter">加入群組</a>
                         </li>
                         <li>
                             <a class="article" href="{{ route('logout') }}"
@@ -134,8 +145,13 @@
                                     <li class="nav-item">
                                         <a class="nav-link" href="/bulletin">{{ __('佈告欄') }}</a>
                                     </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="#">{{ __('任務表') }}</a>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">{{ __('任務') }}</a>
+                                        <div class="dropdown-menu">
+                                          <a class="dropdown-item" href="/task">所有任務</a>
+                                          <a class="dropdown-item" href="#">已完成任務</a>
+                                          {{-- <div class="dropdown-divider"></div>
+                                          <a class="dropdown-item" href="#">Separated link</a> --}}
                                     </li>
                                     @if ($isAdmin)
                                         <li class="nav-item">
@@ -163,9 +179,10 @@
                 @yield('content')
             </main>
         </div>
-        
-    </div>
 
+    </div>
+    @include('inc.addGroup')
+    @include('inc.enterGroup')
     <!-- jQuery CDN - Slim version (=without AJAX) -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <!-- Popper.JS -->

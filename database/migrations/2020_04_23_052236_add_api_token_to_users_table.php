@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 class AddApiTokenToUsersTable extends Migration
 {
@@ -17,7 +18,7 @@ class AddApiTokenToUsersTable extends Migration
             $table->string('api_token', 80)->after('password')
                 ->unique()
                 ->nullable()
-                ->default(NULL);
+                ->default(Str::random(80));
         });
     }
 
