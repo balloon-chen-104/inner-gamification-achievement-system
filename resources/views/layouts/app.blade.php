@@ -11,6 +11,7 @@
 
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}" defer></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
@@ -149,19 +150,19 @@
                                     <li class="nav-item dropdown">
                                         <a class="nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">{{ __('任務') }}</a>
                                         <div class="dropdown-menu">
-                                            <a class="dropdown-item" href="/task">所有任務</a>
+                                            <a class="dropdown-item" href="{{route('task.index')}}">所有任務</a>
                                             <a class="dropdown-item" href="{{route('task.history')}}">過去的任務</a>
                                             <div class="dropdown-divider"></div>
                                             @php
                                                 $authority = 0;
                                                 foreach(\App\Group::find(Auth::user()->active_group)->users as $group_user){
                                                     if($group_user->pivot->user_id == Auth::user()->id){
-                                                        $autority = $group_user->pivot->authority;
+                                                        $authority = $group_user->pivot->authority;
                                                     }
                                                 }
                                             @endphp
                                             @if($authority == 1)
-                                                <a class="dropdown-item" href="#">新增／修改任務</a>
+                                                <a class="dropdown-item" href="{{route('task.edit')}}">新增／修改任務</a>
                                                 <a class="dropdown-item" href="#">審核員工完成任務</a>
                                             @else
                                                 <a class="dropdown-item" href="#">提案新任務</a>

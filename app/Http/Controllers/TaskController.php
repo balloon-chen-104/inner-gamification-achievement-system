@@ -35,7 +35,8 @@ class TaskController extends Controller
      */
     public function create()
     {
-        //
+        $active_group = auth()->user()->active_group;
+        return view('task.taskAddEdit')->withGroup(Group::find($active_group));
     }
 
     /**
@@ -58,7 +59,7 @@ class TaskController extends Controller
     public function history()
     {
         $active_group = auth()->user()->active_group;
-        return view('task.task')->withGroup(Group::find($active_group));
+        return view('task.taskHistory')->withGroup(Group::find($active_group));
     }
 
     /**

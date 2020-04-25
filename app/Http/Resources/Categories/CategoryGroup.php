@@ -3,9 +3,8 @@
 namespace App\Http\Resources\Categories;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Http\Resources\Categories\CategoryGroup as CategoryGroupResource;
 
-class Category extends JsonResource
+class CategoryGroup extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -18,7 +17,7 @@ class Category extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'group' => new CategoryGroupResource($this->whenLoaded('group')),
+            'description' => $this->description
         ];
     }
 }

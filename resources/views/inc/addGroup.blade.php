@@ -27,7 +27,6 @@
         </div>
     </div>
 </div>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
 <script>
 $(document).ready(() => {
     $("#add-group-form").submit((event) => {
