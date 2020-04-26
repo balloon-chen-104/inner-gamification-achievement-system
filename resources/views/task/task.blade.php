@@ -2,12 +2,14 @@
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
-        <div class="col-md-8">
+        <div class="col-md-10">
+            <div class="alert alert-success" id="success-msg" role="alert" style="display:none"></div>
+            <div class="alert alert-danger" id="error-msg" role="alert" style="display:none"></div>
             @if ($group->categories->count() == 0)
             <div class="card mb-3">
                 <div class="card-header" style="cursor: pointer" onclick="toggleCategory()">新增任務種類</div>
                 <div class="card-body" id="add-category" style="display:none">
-                    <form action="">
+                    <form id="add-category-form">
                         <div class="form-group">
                             <label for="category-name">種類名稱</label>
                             <input type="text" class="form-control" id="category-name">
@@ -40,7 +42,7 @@
                             @endif
                         </select>
                     </div>
-                    <div class="float-right input-group input-group-sm mb-3 mr-3" style="width:23ch">
+                    {{-- <div class="float-right input-group input-group-sm mb-3 mr-3" style="width:23ch">
                         <div class="input-group-prepend">
                             <label class="input-group-text" for="dateInputGroupSelect">任務排序</label>
                         </div>
@@ -54,7 +56,7 @@
                             <option value="0" selected>尚無任務</option>
                         @endif
                         </select>
-                    </div>
+                    </div> --}}
                     @if ($group->tasks->count() > 0)
                         <table class="table table-striped">
                             <thead class="thead-light">
@@ -63,26 +65,86 @@
                                     <td scope="col">敘述</td>
                                     <td scope="col">分數</td>
                                     <td scope="col">到期日</td>
+                                    <td scope="col">剩餘次數</td>
                                     <td scope="col">完成回報</td>
                                 </tr>
                             </thead>
-                            @foreach ($group->tasks()->notExpired()->get() as $task)
-                            <tbody id="category-{{$task->category_id}}">
-                                <tr>
-                                    <td>{{ $task->name }}</td>
-                                    <td>{{ $task->description }}</td>
-                                    <td>{{ $task->score }}</td>
-                                    <td>{{ \Carbon\Carbon::parse($task->expired_at)
-                                        ->tz('Europe/London')
-                                        ->setTimeZone('Asia/Taipei')->locale('zh_TW')
-                                        ->diffForHumans()
+                            @php
+                                $todayTasks = $group->tasks()->today()->notExpired()->confirmed()->latest()->get();
+                                $otherTasks = $group->tasks()->confirmed()->notExpired()->get()->diff($todayTasks);
+                            @endphp
+                            @foreach ($todayTasks as $task)
+                                @php
+                                    $confirmed = 0;
+                                    $isReport = false;
+                                    foreach($task->users as $user) {
+                                        if($user->pivot->user_id == Auth::user()->id && $user->pivot->task_id == $task->id) {
+                                            $isReport = true;
+                                            $confirmed = $user->pivot->confirmed;
+                                        }
+                                    }
+                                @endphp
+                                @if($confirmed == 0)
+                                <tbody id="category-{{$task->category_id}}">
+                                    <tr class="table-info">
+                                        <td>
+                                            {{ $task->name }}
+                                            <span class="badge badge-danger" style="font-size: 0.2vw">
+                                                今日新增
+                                            </span>
+                                        </td>
+                                        <td>{{ $task->description }}</td>
+                                        <td>{{ $task->score }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($task->expired_at)
+                                            ->tz('Europe/London')
+                                            ->setTimeZone('Asia/Taipei')->locale('zh_TW')
+                                            ->diffForHumans()
                                         }}</td>
-                                    <td><button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#reportTaskModalCenter" onclick="getTask({{ $task->id }}, '{{ $task->name }}')">回報</button></td>
-                                </tr>
-                            </tbody>
+                                        <td class="text-center">{{ $task->remain_times }}</td>
+                                        @if ($isReport)
+                                        <td><button class="btn btn-sm btn-secondary" disabled>回報</button></td>
+                                        @else
+                                        <td><button class="btn btn-sm btn-primary" id="report-{{$task->id}}" onclick="getTask({{ $task }})">回報</button></td>
+                                        @endif
+                                    </tr>
+                                </tbody>
+                                @endif
+                            @endforeach
+                            @foreach ($otherTasks as $task)
+                            @php
+                                $confirmed = 0;
+                                $isReport = false;
+                                foreach($task->users as $user) {
+                                    if($user->pivot->user_id == Auth::user()->id && $user->pivot->task_id == $task->id) {
+                                        $isReport = true;
+                                        $confirmed = $user->pivot->confirmed;
+                                    }
+                                }
+                            @endphp
+                                @if ($confirmed == 0)
+                                <tbody id="category-{{$task->category_id}}">
+                                    <tr>
+                                        <td>{{ $task->name }}</td>
+                                        <td>{{ $task->description }}</td>
+                                        <td>{{ $task->score }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($task->expired_at)
+                                            ->tz('Europe/London')
+                                            ->setTimeZone('Asia/Taipei')->locale('zh_TW')
+                                            ->diffForHumans()
+                                        }}</td>
+                                        <td class="text-center">{{ $task->remain_times }}</td>
+                                        @if ($isReport)
+                                        <td><button class="btn btn-sm btn-secondary" disabled>回報</button></td>
+                                        @else
+                                        <td><button class="btn btn-sm btn-primary" id="report-{{$task->id}}" onclick="getTask({{ $task }})">回報</button></td>
+                                        @endif
+                                    </tr>
+                                </tbody>
+                                @endif
                             @endforeach
                         </table>
                     @else
+                        <hr class="mt-5">
                         目前沒有任何任務
                     @endif
                 </div>
@@ -92,10 +154,12 @@
 </div>
 @include('inc.reportTask')
 <script>
-    function getTask(id, name) {
+    function getTask(task) {
         $('#task-name').empty();
-        $('#task-name').append(name);
-        $('#task-id').val(id);
+        $('#task-report').empty();
+        $('#task-name').append(task.name);
+        $('#task-id').val(task.id);
+        $('#reportTaskModalCenter').modal('toggle');
     }
     $(() => {
         $('#catInputGroupSelect').change(() => {
@@ -109,4 +173,7 @@
         })
     })
 </script>
+@if ($group->categories->count() == 0)
+@include('inc.addCategory')
+@endif
 @endsection

@@ -23,6 +23,9 @@ class HomeController extends Controller
      */
     public function index()
     {
+        if(isset(auth()->user()->active_group)){
+            return redirect('/bulletin');
+        }
         return view('home');
     }
 }

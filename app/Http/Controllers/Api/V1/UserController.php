@@ -2,19 +2,16 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Category;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Categories\Category as CategoryResource;
+use App\User;
 use Illuminate\Http\Request;
 
-class CategoryController extends Controller
+class UserController extends Controller
 {
-    protected $category;
-
-    public function __construct(Category $category)
+    public function __construct(User $user)
     {
-        $this->category = $category;
-        $this->middleware('auth:api')->only(['store']);
+        $this->user = $user;
+        $this->middleware('auth:api')->except('updatedApi');
     }
     /**
      * Display a listing of the resource.
@@ -23,7 +20,7 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        return CategoryResource::collection($this->category->with('group')->get());
+        //
     }
 
     /**
@@ -34,15 +31,7 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required',
-        ]);
-
-        $this->category->name = $request->input('name');
-        $this->category->group_id = auth()->user()->active_group;
-        $this->category->save();
-        return new CategoryResource($this->category);
-        // return CategoryResource::collection($this->category->with('group')->get());
+        //
     }
 
     /**
@@ -77,5 +66,11 @@ class CategoryController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function updatedApi(Request $request)
+    {
+        $user = $this->user->find($request->id);
+        return ['api_token' => $user->api_token];
     }
 }

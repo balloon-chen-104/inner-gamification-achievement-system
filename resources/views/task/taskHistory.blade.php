@@ -2,7 +2,7 @@
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
-        <div class="col-md-8">
+        <div class="col-md-10">
             <div class="card">
                 <div class="card-header">任務欄</div>
                 <div class="card-body">
@@ -21,7 +21,7 @@
                             @endif
                         </select>
                     </div>
-                    <div class="float-right input-group input-group-sm mb-3 mr-3" style="width:23ch">
+                    {{-- <div class="float-right input-group input-group-sm mb-3 mr-3" style="width:23ch">
                         <div class="input-group-prepend">
                             <label class="input-group-text" for="dateInputGroupSelect">任務排序</label>
                         </div>
@@ -35,7 +35,7 @@
                             <option value="0" selected>尚無任務</option>
                         @endif
                         </select>
-                    </div>
+                    </div> --}}
                     @if ($group->tasks->count() > 0)
                         <table class="table table-striped">
                             <thead class="thead-light">
@@ -44,6 +44,7 @@
                                     <td scope="col">敘述</td>
                                     <td scope="col">分數</td>
                                     <td scope="col">到期日</td>
+                                    <td scope="col">剩餘次數</td>
                                     <td scope="col">完成回報</td>
                                 </tr>
                             </thead>
@@ -58,13 +59,15 @@
                                         ->setTimeZone('Asia/Taipei')->locale('zh_TW')
                                         ->diffForHumans()
                                         }}</td>
+                                    <td>{{ $task->remain_times }}</td>
                                     <td><button class="btn btn-sm btn-secondary" disabled>回報</button></td>
                                 </tr>
                             </tbody>
                             @endforeach
                         </table>
                     @else
-                        目前沒有任何任務
+                    <hr class="mt-5">
+                    目前沒有已到期任何任務
                     @endif
                 </div>
             </div>

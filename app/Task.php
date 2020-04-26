@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class Task extends Model
 {
     protected $fillable = [];
-    protected $hidden = ['category_id', 'creator_id'];
+    protected $hidden = [];
 
     public function scopeNotExpired(Builder $query)
     {
@@ -23,12 +23,26 @@ class Task extends Model
 
     public function scopeLatest(Builder $query)
     {
-        return $query->orderBy(static::CREATED_AT, 'desc');
+        return $query->orderBy('tasks.'.static::CREATED_AT, 'desc');
+    }
+
+    public function scopeToday(Builder $query)
+    {
+        return $query->where('tasks.'. static::CREATED_AT, '>', Carbon::today());
+    }
+
+    public function scopeConfirmed(Builder $query)
+    {
+        return $query->where('confirmed', 1);
+    }
+    public function scopeNotConfirmed(Builder $query)
+    {
+        return $query->where('confirmed', 0);
     }
 
     public function users()
     {
-        return $this->belongsToMany('App\User');
+        return $this->belongsToMany('App\User')->withPivot(['confirmed', 'report', 'created_at', 'updated_at']);
     }
 
     public function category()
