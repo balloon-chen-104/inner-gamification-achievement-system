@@ -171,14 +171,14 @@
                                     </li>
                                     @if ($isAdmin)
                                         <li class="nav-item">
-                                            <a class="nav-link" href="#">{{ __('成員數據') }}</a>
+                                            <a class="nav-link" href="/leaderboard">{{ __('成員數據') }}</a>
                                         </li>
                                         <li class="nav-item">
                                             <a class="nav-link" href="/setting">{{ __('設定') }}</a>
                                         </li>
                                     @else
                                         <li class="nav-item">
-                                            <a class="nav-link" href="#">{{ __('排行榜') }}</a>
+                                            <a class="nav-link" href="/leaderboard">{{ __('排行榜') }}</a>
                                         </li>
                                     @endif
                                 @endif

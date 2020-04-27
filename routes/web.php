@@ -51,3 +51,6 @@ Route::prefix('task')->name('task.')->group(function() {
 
 
 Route::get('/profile', 'ProfileController@index');
+Route::get('/profile/id/edit', 'ProfileController@edit');
+
+Route::get('/leaderboard', 'LeaderboardController@index');
