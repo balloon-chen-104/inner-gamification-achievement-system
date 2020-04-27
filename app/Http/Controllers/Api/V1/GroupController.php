@@ -8,6 +8,7 @@ use App\User;
 use Illuminate\Http\Request;
 use App\Http\Resources\Groups\Group as GroupResource;
 use App\Http\Controllers\Api\V1\UpdateApiToken;
+use Illuminate\Support\Str;
 
 class GroupController extends Controller
 {
@@ -46,6 +47,7 @@ class GroupController extends Controller
         $this->group->name = $request->input('name');
         $this->group->creator_id = auth()->user()->id;
         $this->group->description = $request->input('description');
+        $this->group->group_token = Str::random(5);
         $this->group->save();
         $this->group->users()->attach(auth()->user()->id, ['authority' => 1]);
         $this->updateApiToken($this->group->creator);

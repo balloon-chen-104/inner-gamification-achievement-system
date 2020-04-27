@@ -192,13 +192,19 @@
             </nav>
 
             <main class="py-4">
+                @auth
+                <input type="text" id="api-token" value="{{Auth::user()->api_token}}" style="display:none">
+                @endauth
                 @yield('content')
             </main>
         </div>
 
     </div>
+    @auth
     @include('inc.addGroup')
     @include('inc.enterGroup')
+    @include('inc.updateApiToken')
+    @endauth
     <!-- jQuery CDN - Slim version (=without AJAX) -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <!-- Popper.JS -->

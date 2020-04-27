@@ -1,4 +1,3 @@
-@auth
 <div class="modal fade" id="addGroupModalCenter" tabindex="-1" role="dialog" aria-labelledby="addGroupModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -42,7 +41,7 @@ function addGroup(){
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
-            'authorization': `Bearer {{Auth::user()->api_token}}`
+            'authorization': `Bearer ${$('#api-token').val()}`
         }
     });
     $.ajax({
@@ -67,6 +66,7 @@ function addGroup(){
                     </form>
                 </li>`);
             $('#addGroupModalCenter').modal('toggle');
+            apiToken();
         },
         error: (e) => {
             console.log("ERROR: ", e);
@@ -75,4 +75,3 @@ function addGroup(){
     });
 }
 </script>
-@endauth

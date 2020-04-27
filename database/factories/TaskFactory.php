@@ -14,8 +14,8 @@ $factory->define(Task::class, function (Faker $faker) {
         'score' => $faker->randomNumber(2),
         'remain_times' => 20,
         'confirmed' => 0,
-        'expired_at' => $faker->dateTimeInInterval('-1 day', '+1 month'),
-        'created_at' => $faker->dateTimeInInterval('-1 day', '+1 month'),
-        'updated_at' => $faker->dateTimeInInterval('now', '+2 month')
+        'expired_at' => $faker->dateTimeInInterval('-1 month', '+1 month'),
+        'created_at' => $faker->dateTimeInInterval('-1 day', '+1 day'),
+        'updated_at' => $faker->dateTimeInInterval('now', 'now')
     ];
 });

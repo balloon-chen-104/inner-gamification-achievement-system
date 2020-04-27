@@ -1,9 +1,8 @@
-@auth
 <div class="modal fade" id="enterGroupModalCenter" tabindex="-1" role="dialog" aria-labelledby="enterGroupModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="addGroupModalCenterTitle">加入群組</h5>
+                <h5 class="modal-title" id="enterGroupModalCenterTitle">加入群組</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             </button>
             </div>
@@ -27,17 +26,17 @@
 $(document).ready(() => {
     $("#enter-group-form").submit((event) => {
         event.preventDefault();
-        addGroup();
+        enterGroup();
     });
 });
-function addGroup(){
+function enterGroup(){
     const data = {
         'group_token': $('#group-id').val(),
     };
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
-            'authorization': `Bearer {{Auth::user()->api_token}}`
+            'authorization': `Bearer ${$('#api-token').val()}`
         }
     });
     $.ajax({
@@ -62,6 +61,7 @@ function addGroup(){
                     </form>
                 </li>`);
             $('#enterGroupModalCenter').modal('toggle');
+            apiToken()
         },
         error: (e) => {
             console.log("ERROR: ", e);
@@ -70,4 +70,3 @@ function addGroup(){
     });
 }
 </script>
-@endauth

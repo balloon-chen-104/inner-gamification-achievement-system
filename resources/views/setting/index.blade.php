@@ -8,7 +8,7 @@
             <div class="card">
                 <div class="card-header">群組ID</div>
                 <div class="card-body">
-                    {{\App\Group::find(Auth::user()->active_group)->first()->group_token}}
+                    {{\App\Group::where('id', Auth::user()->active_group)->first()->group_token}}
                 </div>
             </div>
         </div>
