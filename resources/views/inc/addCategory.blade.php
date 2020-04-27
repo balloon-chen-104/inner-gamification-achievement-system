@@ -33,6 +33,7 @@ function addCategory(){
                 $('.custom-select').append(`<option value="${category.id}">${category.name}</option>
                 `);
             }
+            apiToken();
             setTimeout(()=>{
                 $('#success-msg').slideToggle();
             }, 2000);

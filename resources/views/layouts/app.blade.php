@@ -153,15 +153,7 @@
                                             <a class="dropdown-item" href="{{route('task.index')}}">所有任務</a>
                                             <a class="dropdown-item" href="{{route('task.history')}}">過去的任務</a>
                                             <div class="dropdown-divider"></div>
-                                            @php
-                                                $authority = 0;
-                                                foreach(\App\Group::find(Auth::user()->active_group)->users as $group_user){
-                                                    if($group_user->pivot->user_id == Auth::user()->id){
-                                                        $authority = $group_user->pivot->authority;
-                                                    }
-                                                }
-                                            @endphp
-                                            @if($authority == 1)
+                                            @if($isAdmin)
                                                 <a class="dropdown-item" href="{{route('task.edit')}}">新增／修改任務</a>
                                                 <a class="dropdown-item" href="#">審核員工完成任務</a>
                                             @else

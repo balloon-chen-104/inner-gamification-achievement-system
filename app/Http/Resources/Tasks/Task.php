@@ -22,9 +22,20 @@ class Task extends JsonResource
             'description' => $this->description,
             'score' => $this->score,
             'remain_times' => $this->remain_times,
-            'expired_at' => $this->expried_at,
+            'expired_at' => $this->expired_at,
             'creator' => new TaskCreatorResource($this->whenLoaded('creator')),
-            'category' => new TaskCategoryResource($this->whenLoaded('category'))
+            'category' => new TaskCategoryResource($this->whenLoaded('category')),
+            'confirmed_at' => $this->whenLoaded('users', function() use($request) {
+                $confirmed_at = '';
+                foreach($this->users as $user) {
+                    if($user->pivot->task_id == $this->id){
+                        if($request->input('user_id') && $user->id == $request->input('user_id')){
+                            $confirmed_at = $user->pivot->updated_at;
+                        }
+                    }
+                }
+                return $confirmed_at;
+            })
         ];
     }
 }

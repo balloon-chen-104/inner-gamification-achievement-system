@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Http\Controllers\Api\V1\UpdateApiToken;
 use App\Category;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Categories\Category as CategoryResource;
@@ -9,6 +10,8 @@ use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
+    use UpdateApiToken;
+
     protected $category;
 
     public function __construct(Category $category)
@@ -41,6 +44,7 @@ class CategoryController extends Controller
         $this->category->name = $request->input('name');
         $this->category->group_id = auth()->user()->active_group;
         $this->category->save();
+        $this->updateApiToken(auth()->user());
         return new CategoryResource($this->category);
         // return CategoryResource::collection($this->category->with('group')->get());
     }

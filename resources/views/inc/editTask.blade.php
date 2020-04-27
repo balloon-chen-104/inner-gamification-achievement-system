@@ -6,8 +6,9 @@
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             </button>
             </div>
-            <form action="/" method="POST">
+            <form id="edit-task-form" method="POST">
                 @csrf
+                @method('PUT')
                 <div class="modal-body">
                     <input type="text" name="task-id" id="task-id" style="display: none">
                     <div class="form-row mb-3">
@@ -56,3 +57,73 @@
         </div>
     </div>
 </div>
+@auth
+<script>
+    $(document).ready(() => {
+        $("#edit-task-form").submit((event) => {
+            event.preventDefault();
+            editTask();
+        });
+    });
+    function editTask(){
+        const data = {
+            'name': $('#task-name').val(),
+            'category_id': $("#task-category").find(":selected").val(),
+            'description': $('#task-description').val(),
+            'expired_at': $('#task-expired-at').val(),
+            'score': $('#task-score').val(),
+            'remain_times': $('#task-remain').val()
+        };
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                'authorization': `Bearer ${$('#api-token').val()}`
+            }
+        });
+        $.ajax({
+            type: "PUT",
+            contentType: "application/json",
+            url: `/api/v1/task/${$('#task-id').val()}`,
+            dataType: 'json',
+            data: JSON.stringify(data),
+            success: (result) => {
+                const task = result.data
+                console.log(task);
+                const expiredAt = new Date(task.expired_at);
+                let expiredYear = expiredAt.getFullYear();
+                let expiredMonth = (expiredAt.getMonth() + 1 < 10)? `0${expiredAt.getMonth() + 1}`: expiredAt.getMonth() + 1;
+                let expiredDate = (expiredAt.getDate()< 10)? `0${expiredAt.getDate()}`: expiredAt.getDate();
+                let param = {'id': task.id,'name': task.name,'description': task.description,'score':task.score,'expired_at': task.expiredAt,'remain_times': task.remain_times};
+                $('#success-msg').empty();
+                $('#success-msg').prepend(`任務已修改`);
+                $('#success-msg').slideToggle();
+                $(`#edit-task-${task.id}`).empty().append(`
+                    <td>${task.name}</td>
+                    <td>${task.description}</td>
+                    <td>${task.score}</td>
+                    <td>${expiredYear}-${expiredMonth}-${expiredDate}</td>
+                    <td class="text-center">${task.remain_times}</td>
+                `);
+                $(`#edit-task-${task.id}`).append('<td><button class="btn btn-sm btn-primary"' +
+                    'onclick="getTask(' + JSON.stringify(param) + ')">修改</button></td>');
+
+                $('#editTaskModalCenter').modal('toggle');
+                apiToken();
+                setTimeout(()=>{
+                    $('#success-msg').slideToggle();
+                }, 2000);
+
+            },
+            error: (e) => {
+                console.log("ERROR: ", e);
+                $('#error-msg').empty();
+                $('#error-msg').prepend(`任務修改失敗`);
+                $('#error-msg').slideToggle();
+                setTimeout(()=>{
+                    $('#error-msg').slideToggle();
+                }, 2000);
+            },
+        });
+    }
+</script>
+@endauth

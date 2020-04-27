@@ -20,14 +20,15 @@
             <div class="card mb-3">
                 <div class="card-header" style="cursor: pointer" onclick="toggleTaskAdd()">新增任務</div>
                 <div class="card-body" id="add-task" style="display:none">
-                    <form action="">
+                    <form id="add-task-form" method="POST">
+                        @csrf
                         <div class="form-row">
                             <div class="col mr-3">
                                 <label for="add-task-name">任務名稱</label>
                                 <input type="text" class="form-control" id="add-task-name">
                             </div>
                             <div class="col">
-                                <label for="add-task-name">任務種類</label>
+                                <label for="add-task-category">任務種類</label>
                                 <select class="custom-select" name="" id="add-task-category">
                                     @if ($group->categories->count() > 0)
                                         <option value="-1" selected disabled>選擇任務種類</option>
@@ -41,20 +42,20 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="task-description">任務內容描述</label>
+                            <label for="add-task-description">任務內容描述</label>
                             <textarea name="task-description" class="form-control" id="add-task-description" cols="30" rows="2" required></textarea>
                         </div>
                         <div class="form-group">
-                            <label for="task-expired-at">任務到期日</label>
+                            <label for="add-task-expired-at">任務到期日</label>
                             <input type="text" class="form-control datepicker" id="add-task-expired-at" required>
                         </div>
                         <div class="form-row">
                             <div class="col mr-3">
-                                <label for="task-score">分數</label>
+                                <label for="add-task-score">分數</label>
                                 <input type="number" id="add-task-score" class="form-control" value="20" required>
                             </div>
                             <div class="col">
-                                <label for="task-remain">剩餘次數</label>
+                                <label for="add-task-remain">剩餘次數</label>
                                 <input type="number" id="add-task-remain" class="form-control" value="20" required>
                             </div>
                         </div>
@@ -66,7 +67,7 @@
             <div class="card mb-3">
                 <div class="card-header" style="cursor: pointer" onclick="toggleTaskPropose()">審查員工任務提案</div>
                 <div class="card-body" id="propose-task" style="display:none">
-                    @if ($group->tasks->count() > 0)
+                    @if ($group->tasks()->notConfirmed()->notExpired()->get()->count() > 0)
                         <table class="table table-striped">
                             <thead class="thead-light">
                                 <tr>
@@ -138,7 +139,7 @@
                 <div class="card-header" style="cursor: pointer" onclick="toggleTaskEdit()">修改目前已有任務</div>
                 <div class="card-body" id="edit-task" style="display:none">
                     @if ($group->tasks->count() > 0)
-                        <table class="table table-striped">
+                        <table class="table table-striped" id="current-task">
                             <thead class="thead-light">
                                 <tr>
                                     <td scope="col">姓名</td>
@@ -155,19 +156,18 @@
                             @endphp
                             @foreach ($todayTasks as $task)
                             <tbody id="category-{{$task->category_id}}">
-                                <tr class="table-info">
+                                <tr class="table-info" id="edit-task-{{$task->id}}">
                                     <td>{{ $task->name }}</td>
                                     <td>{{ $task->description }}</td>
                                     <td>{{ $task->score }}</td>
                                     <td>{{ \Carbon\Carbon::parse($task->expired_at)
                                         ->tz('Europe/London')
                                         ->setTimeZone('Asia/Taipei')->locale('zh_TW')
-                                        ->diffForHumans()
+                                        ->toDateString()
                                     }}</td>
                                     <td class="text-center">{{ $task->remain_times }}</td>
                                     <td>
-                                        <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#editTaskModalCenter"
-                                            onclick="getTask({{$task}})">
+                                        <button class="btn btn-sm btn-primary" onclick="getTask({{$task}})">
                                             修改
                                         </button>
                                     </td>
@@ -176,19 +176,18 @@
                             @endforeach
                             @foreach ($otherTasks as $task)
                             <tbody id="category-{{$task->category_id}}">
-                                <tr>
+                                <tr id="edit-task-{{$task->id}}">
                                     <td>{{ $task->name }}</td>
                                     <td>{{ $task->description }}</td>
                                     <td>{{ $task->score }}</td>
                                     <td>{{ \Carbon\Carbon::parse($task->expired_at)
                                         ->tz('Europe/London')
                                         ->setTimeZone('Asia/Taipei')->locale('zh_TW')
-                                        ->diffForHumans()
+                                        ->toDateString()
                                     }}</td>
                                     <td class="text-center">{{ $task->remain_times }}</td>
                                     <td>
-                                        <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#editTaskModalCenter"
-                                            onclick="getTask({{$task}})">
+                                        <button class="btn btn-sm btn-primary" onclick="getTask({{$task}})">
                                             修改
                                         </button>
                                     </td>
@@ -207,10 +206,14 @@
 @include('inc.editTask')
 @include('inc.datePicker')
 <script>
+    // console.log($('#propose-task').has('table thead').length)
     $('.datepicker').datepicker({
         format: 'yyyy-mm-dd',
     });
     function getTask(task) {
+        if(typeof task === 'string') {
+            task = JSON.parse(task);
+        }
         $('#task-name').val(task.name);
         $('#task-id').val(task.id);
         $('#task-description').val(task.description);
@@ -219,13 +222,11 @@
                 $(this).attr('selected', true);
             }
         })
-        const expiredAt = new Date(task.expired_at);
-        let expiredYear = expiredAt.getFullYear();
-        let expiredMonth = (expiredAt.getMonth() + 1 < 10)? `0${expiredAt.getMonth() + 1}`: expiredAt.getMonth() + 1;
-        let expiredDate = (expiredAt.getDate()< 10)? `0${expiredAt.getDate()}`: expiredAt.getDate();
-        $('#task-expired-at').val(`${expiredYear}-${expiredMonth}-${expiredDate}`);
+        const expiredAt = task.expired_at.split(" ")[0];
+        $('#task-expired-at').val(`${expiredAt}`);
         $('#task-score').val(task.score);
         $('#task-remain').val(task.remain_times);
+        $('#editTaskModalCenter').modal('toggle');
     }
     function toggleCategory() {
         $('#add-category').slideToggle();
@@ -241,4 +242,5 @@
     }
 </script>
 @include('inc.addCategory')
+@include('inc.addTask')
 @endsection

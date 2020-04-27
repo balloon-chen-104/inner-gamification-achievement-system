@@ -36,7 +36,7 @@
                         @endif
                         </select>
                     </div> --}}
-                    @if ($group->tasks->count() > 0)
+                    @if ($group->tasks()->expired()->get()->count() > 0)
                         <table class="table table-striped">
                             <thead class="thead-light">
                                 <tr>
@@ -67,7 +67,7 @@
                         </table>
                     @else
                     <hr class="mt-5">
-                    目前沒有已到期任何任務
+                    目前沒有已到期任務
                     @endif
                 </div>
             </div>

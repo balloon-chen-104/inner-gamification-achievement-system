@@ -89,7 +89,7 @@
                                     <tr class="table-info">
                                         <td>
                                             {{ $task->name }}
-                                            <span class="badge badge-danger" style="font-size: 0.2vw">
+                                            <span class="badge badge-danger" style="font-size: 10px">
                                                 今日新增
                                             </span>
                                         </td>
@@ -102,7 +102,7 @@
                                         }}</td>
                                         <td class="text-center">{{ $task->remain_times }}</td>
                                         @if ($isReport)
-                                        <td><button class="btn btn-sm btn-secondary" disabled>回報</button></td>
+                                        <td><button class="btn btn-sm btn-secondary" disabled>待審核</button></td>
                                         @else
                                         <td><button class="btn btn-sm btn-primary" id="report-{{$task->id}}" onclick="getTask({{ $task }})">回報</button></td>
                                         @endif
@@ -134,7 +134,7 @@
                                         }}</td>
                                         <td class="text-center">{{ $task->remain_times }}</td>
                                         @if ($isReport)
-                                        <td><button class="btn btn-sm btn-secondary" disabled>回報</button></td>
+                                        <td><button class="btn btn-sm btn-secondary" disabled>待審核</button></td>
                                         @else
                                         <td><button class="btn btn-sm btn-primary" id="report-{{$task->id}}" onclick="getTask({{ $task }})">回報</button></td>
                                         @endif

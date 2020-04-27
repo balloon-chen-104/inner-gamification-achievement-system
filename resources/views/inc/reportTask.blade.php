@@ -55,8 +55,9 @@
                 $('#success-msg').empty();
                 $('#success-msg').append(`任務 ${$('#task-name').text()} 已回報成功`);
                 $('#success-msg').slideToggle();
-                $(`#report-${taskId}`).removeClass( 'btn-primary' ).addClass( 'btn-secondary' ).attr('disabled', true);
+                $(`#report-${taskId}`).removeClass( 'btn-primary' ).addClass( 'btn-secondary' ).attr('disabled', true).html('待審核');
                 $('#reportTaskModalCenter').modal('toggle');
+                apiToken();
                 setTimeout(()=>{
                     $('#success-msg').slideToggle();
                 }, 2000);
