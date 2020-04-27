@@ -148,7 +148,7 @@ class TaskController extends Controller
                 // return $value->users->count() > 0;
                 if($value->users->count() > 0){
                     foreach($value->users as $user) {
-                        if($user->id == $request->input('user_id')) {
+                        if($user->id == $request->input('user_id') && $user->pivot->confirmed == 1) {
                             return true;
                         }
                     }
@@ -159,7 +159,7 @@ class TaskController extends Controller
                 return $item = $item->where('id', $item->id)->with('users')->with('category')->first();
             });
 
+        TaskResource::withoutWrapping();
         return TaskResource::collection($tasks);
-        return collect($tasks);
     }
 }

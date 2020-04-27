@@ -22,10 +22,12 @@ Route::prefix('v1')->namespace('Api\V1')->name('api.v1.')->group(function() {
     Route::apiResource('task', 'TaskController');
     Route::prefix('task')->name('task.')->group(function() {
         Route::post('/report', 'TaskController@report')->name('report');
-        Route::post('/test', 'TaskController@getConfirmedTasks');
+        Route::post('/confirmed', 'TaskController@getConfirmedTasks');
     });
     Route::apiResource('group', 'GroupController');
     Route::apiResource('category', 'CategoryController')->only(['index', 'store']);
-    Route::post('group/enter', 'GroupController@enter')->name('group.enter');
+    Route::prefix('group')->name('group.')->group(function() {
+        Route::post('/enter', 'GroupController@enter')->name('enter');
+    });
     Route::post('flashMessage', 'FlashMessageController@store')->name('flashMessage.store');
 });
