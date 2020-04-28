@@ -40,7 +40,7 @@
                         <table class="table table-striped">
                             <thead class="thead-light">
                                 <tr>
-                                    <td scope="col">姓名</td>
+                                    <td scope="col">任務名</td>
                                     <td scope="col">敘述</td>
                                     <td scope="col">分數</td>
                                     <td scope="col">到期日</td>

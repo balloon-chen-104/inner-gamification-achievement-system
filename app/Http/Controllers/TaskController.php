@@ -13,7 +13,7 @@ class TaskController extends Controller
     public function __construct(Task $task, Group $group)
     {
         $this->task = $task;
-        $this->task = $group;
+        $this->group = $group;
 
         $this->middleware('auth');
     }
@@ -24,8 +24,10 @@ class TaskController extends Controller
      */
     public function index()
     {
-        $active_group = auth()->user()->active_group;
-        return view('task.task')->withGroup(Group::find($active_group));
+        $group = $this->group->find(auth()->user()->active_group);
+        $todayTasks = $group->tasks()->today()->notExpired()->confirmed()->latest()->get();
+        $otherTasks = $group->tasks()->confirmed()->notExpired()->get()->diff($todayTasks);
+        return view('task.task')->withTasks(collect(['todayTasks' => $todayTasks, 'otherTasks' => $otherTasks]));
     }
 
     /**
@@ -91,8 +93,42 @@ class TaskController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function verify()
     {
-        //
+        $active_group = auth()->user()->active_group;
+        // dd(auth()->user()->active_group);
+        $tasks = $this->group->find($active_group)->tasks;
+
+        $confirmedTasks = $tasks->filter(function($value, $key) {
+            if($value->users->count() > 0){
+                foreach($value->users as $user) {
+                    if($user->pivot->confirmed == 1) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        })
+        ->values();
+        $notConfirmedTasks = $tasks->filter(function($value, $key) {
+            if($value->users->count() > 0){
+                foreach($value->users as $user) {
+                    if($user->pivot->confirmed == 0) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        })
+        ->values();
+        // dd(collect([
+        //     'confirmedTasks' => $confirmedTasks,
+        //     'notConfirmedTasks' => $notConfirmedTasks
+        // ]));
+
+        return view('task.taskVerify')->withTasks(collect([
+            'confirmedTasks' => $confirmedTasks,
+            'notConfirmedTasks' => $notConfirmedTasks
+        ]));
     }
 }
