@@ -50,7 +50,9 @@ Route::prefix('task')->name('task.')->group(function() {
 });
 
 
-Route::get('/profile', 'ProfileController@index');
-Route::get('/profile/id/edit', 'ProfileController@edit');
+Route::get('/profile/{id}', 'ProfileController@show');
+Route::get('/profile/{id}/edit', 'ProfileController@edit');
+Route::put('/profile/{id}', 'ProfileController@update');
 
-Route::get('/leaderboard', 'LeaderboardController@index');
+// Route::get('/leaderboard', 'LeaderboardController@index');
+Route::get('/leaderboard', 'ProfileController@index');

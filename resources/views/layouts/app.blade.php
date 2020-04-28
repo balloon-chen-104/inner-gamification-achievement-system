@@ -159,23 +159,18 @@
                                             @else
                                                 <a class="dropdown-item" href="#">提案新任務</a>
                                             @endif
-
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="/leaderboard">{{ __('英雄榜') }}</a>
                                     </li>
                                     @if ($isAdmin)
                                         <li class="nav-item">
-                                            <a class="nav-link" href="/leaderboard">{{ __('成員數據') }}</a>
-                                        </li>
-                                        <li class="nav-item">
                                             <a class="nav-link" href="/setting">{{ __('設定') }}</a>
-                                        </li>
-                                    @else
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="/leaderboard">{{ __('排行榜') }}</a>
                                         </li>
                                     @endif
                                 @endif
                                 <li class="nav-item">
-                                    <a class="nav-link" href="/profile">{{ Auth::user()->name }}</a>
+                                    <a class="nav-link" href="/profile/{{ Auth::user()->id }}">{{ Auth::user()->name }}</a>
                                 </li>
                             @endguest
                         </ul>
