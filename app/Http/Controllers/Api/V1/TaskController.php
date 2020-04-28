@@ -8,6 +8,7 @@ use App\Http\Resources\Tasks\Task as TaskResource;
 use App\Http\Controllers\Controller;
 use App\Task;
 use Carbon\Carbon;
+use GuzzleHttp\Promise\TaskQueue;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
@@ -18,7 +19,7 @@ class TaskController extends Controller
     public function __construct(Task $task)
     {
         $this->task = $task;
-        $this->middleware('auth:api')->except('getConfirmedTasks');
+        $this->middleware('auth:api');
     }
     /**
      * Display a listing of the resource.
@@ -137,29 +138,38 @@ class TaskController extends Controller
         }
     }
 
-    public function getConfirmedTasks(Request $request) {
-        $request->validate([
-            'user_id' => 'required',
-            'group_id' => 'required'
-        ]);
-
-        $tasks = Group::find($request->input('group_id'))->tasks
-            ->filter(function($value, $key) use($request) {
-                // return $value->users->count() > 0;
-                if($value->users->count() > 0){
-                    foreach($value->users as $user) {
-                        if($user->id == $request->input('user_id') && $user->pivot->confirmed == 1) {
-                            return true;
+    public function getConfirmedTasks()
+    {
+        if(isset(auth()->user()->active_group)) {
+            $tasks = Group::find(auth()->user()->active_group)->tasks
+                ->filter(function($value, $key) {
+                    if($value->users->count() > 0){
+                        foreach($value->users as $user) {
+                            if($user->id == auth()->user()->id && $user->pivot->confirmed == 1) {
+                                return true;
+                            }
                         }
                     }
-                }
-                return false;
-            })
-            ->transform(function ($item, $key) {
-                return $item = $item->where('id', $item->id)->with('users')->with('category')->first();
-            });
+                    return false;
+                })
+                ->transform(function ($item, $key) {
+                    return $item = $item->where('id', $item->id)->with('users')->with('category')->first();
+                });
+        }else {
+            return ['message' => 'This user has no active group.'];
+        }
 
         TaskResource::withoutWrapping();
         return TaskResource::collection($tasks);
+    }
+
+    public function approveSuggestionTask(Request $request)
+    {
+        $request->validate(['id' => 'required']);
+        $task = $this->task->find($request->input('id'));
+        $task->confirmed = 1;
+        $task->save();
+        $this->updateApiToken(auth()->user());
+        return new TaskResource($task);
     }
 }

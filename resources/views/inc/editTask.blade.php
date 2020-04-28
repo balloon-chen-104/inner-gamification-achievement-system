@@ -89,10 +89,7 @@
             success: (result) => {
                 const task = result.data
                 console.log(task);
-                const expiredAt = new Date(task.expired_at);
-                let expiredYear = expiredAt.getFullYear();
-                let expiredMonth = (expiredAt.getMonth() + 1 < 10)? `0${expiredAt.getMonth() + 1}`: expiredAt.getMonth() + 1;
-                let expiredDate = (expiredAt.getDate()< 10)? `0${expiredAt.getDate()}`: expiredAt.getDate();
+                const expiredAt = task.expired_at.split(" ")[0];
                 let param = {'id': task.id,'name': task.name,'description': task.description,'score':task.score,'expired_at': task.expiredAt,'remain_times': task.remain_times};
                 $('#success-msg').empty();
                 $('#success-msg').prepend(`任務已修改`);
@@ -101,7 +98,7 @@
                     <td>${task.name}</td>
                     <td>${task.description}</td>
                     <td>${task.score}</td>
-                    <td>${expiredYear}-${expiredMonth}-${expiredDate}</td>
+                    <td>${expiredAt}</td>
                     <td class="text-center">${task.remain_times}</td>
                 `);
                 $(`#edit-task-${task.id}`).append('<td><button class="btn btn-sm btn-primary"' +

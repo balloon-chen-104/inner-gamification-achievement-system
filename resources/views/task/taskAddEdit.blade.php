@@ -71,7 +71,7 @@
                         <table class="table table-striped">
                             <thead class="thead-light">
                                 <tr>
-                                    <td scope="col">姓名</td>
+                                    <td scope="col">任務名</td>
                                     <td scope="col">敘述</td>
                                     <td scope="col">分數</td>
                                     <td scope="col">到期日</td>
@@ -84,8 +84,31 @@
                                 $otherTasks = $group->tasks()->notConfirmed()->notExpired()->get()->diff($todayTasks);
                             @endphp
                             @foreach ($todayTasks as $task)
-                            <tbody id="category-{{$task->category_id}}">
-                                <tr class="table-info">
+                            <tbody>
+                                <tr class="table-info" id="approve-task-{{$task->id}}">
+                                    <td>{{ $task->name }}</td>
+                                    <td>{{ $task->description }}</td>
+                                    <td>{{ $task->score }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($task->expired_at)
+                                        ->tz('Europe/London')
+                                        ->setTimeZone('Asia/Taipei')->locale('zh_TW')
+                                        ->toDateString()
+                                    }}</td>
+                                    <td class="text-center">{{ $task->remain_times }}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary" onclick="approveSuggestionTask({{$task->id}})">
+                                            確認
+                                        </button>
+                                        <button class="btn btn-sm btn-secondary">
+                                            駁回
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            @endforeach
+                            @foreach ($otherTasks as $task)
+                            <tbody>
+                                <tr id="approve-task-{{$task->id}}">
                                     <td>{{ $task->name }}</td>
                                     <td>{{ $task->description }}</td>
                                     <td>{{ $task->score }}</td>
@@ -98,29 +121,6 @@
                                     <td>
                                         <button class="btn btn-sm btn-primary">
                                             確認
-                                        </button>
-                                        <button class="btn btn-sm btn-secondary">
-                                            駁回
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                            @endforeach
-                            @foreach ($otherTasks as $task)
-                            <tbody id="category-{{$task->category_id}}">
-                                <tr>
-                                    <td>{{ $task->name }}</td>
-                                    <td>{{ $task->description }}</td>
-                                    <td>{{ $task->score }}</td>
-                                    <td>{{ \Carbon\Carbon::parse($task->expired_at)
-                                        ->tz('Europe/London')
-                                        ->setTimeZone('Asia/Taipei')->locale('zh_TW')
-                                        ->toDateString()
-                                    }}</td>
-                                    <td class="text-center">{{ $task->remain_times }}</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-primary">
-                                            修改
                                         </button>
                                         <button class="btn btn-sm btn-secondary">
                                             駁回
@@ -142,7 +142,7 @@
                         <table class="table table-striped" id="current-task">
                             <thead class="thead-light">
                                 <tr>
-                                    <td scope="col">姓名</td>
+                                    <td scope="col">任務名</td>
                                     <td scope="col">敘述</td>
                                     <td scope="col">分數</td>
                                     <td scope="col">到期日</td>
@@ -155,7 +155,7 @@
                                 $otherTasks = $group->tasks()->confirmed()->notExpired()->get()->diff($todayTasks);
                             @endphp
                             @foreach ($todayTasks as $task)
-                            <tbody id="category-{{$task->category_id}}">
+                            <tbody>
                                 <tr class="table-info" id="edit-task-{{$task->id}}">
                                     <td>{{ $task->name }}</td>
                                     <td>{{ $task->description }}</td>
@@ -175,7 +175,7 @@
                             </tbody>
                             @endforeach
                             @foreach ($otherTasks as $task)
-                            <tbody id="category-{{$task->category_id}}">
+                            <tbody>
                                 <tr id="edit-task-{{$task->id}}">
                                     <td>{{ $task->name }}</td>
                                     <td>{{ $task->description }}</td>
@@ -243,4 +243,5 @@
 </script>
 @include('inc.addCategory')
 @include('inc.addTask')
+@include('inc.approveSuggestionTask')
 @endsection

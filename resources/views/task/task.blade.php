@@ -5,7 +5,10 @@
         <div class="col-md-10">
             <div class="alert alert-success" id="success-msg" role="alert" style="display:none"></div>
             <div class="alert alert-danger" id="error-msg" role="alert" style="display:none"></div>
-            @if ($group->categories->count() == 0)
+            @php
+                $categories = \App\Group::find(Auth::user()->active_group)->categories;
+            @endphp
+            @if ($categories->count() == 0)
             <div class="card mb-3">
                 <div class="card-header" style="cursor: pointer" onclick="toggleCategory()">新增任務種類</div>
                 <div class="card-body" id="add-category" style="display:none">
@@ -32,9 +35,9 @@
                             <label class="input-group-text" for="catInputGroupSelect">任務種類</label>
                         </div>
                         <select class="custom-select" name="" id="catInputGroupSelect">
-                            @if ($group->categories->count() > 0)
+                            @if ($categories->count() > 0)
                                 <option value="-1" selected>全部（預設）</option>
-                                @foreach ($group->categories as $category)
+                                @foreach ($categories as $category)
                                 <option value="{{$category->id}}">{{$category->name}}</option>
                                 @endforeach
                             @else
@@ -47,7 +50,7 @@
                             <label class="input-group-text" for="dateInputGroupSelect">任務排序</label>
                         </div>
                         <select class="custom-select" name="" id="dateInputGroupSelect">
-                        @if ($group->tasks->count() > 0)
+                        @if ($tasks->count() > 0)
                             <option value="-1" selected>預設</option>
                             <option value="">按到期日</option>
                             <option value="">按任務新增日</option>
@@ -57,11 +60,11 @@
                         @endif
                         </select>
                     </div> --}}
-                    @if ($group->tasks->count() > 0)
+                    @if ($tasks->get('todayTasks')->count() > 0 || $tasks->get('otherTasks')->count() > 0)
                         <table class="table table-striped">
                             <thead class="thead-light">
                                 <tr>
-                                    <td scope="col">姓名</td>
+                                    <td scope="col">任務名</td>
                                     <td scope="col">敘述</td>
                                     <td scope="col">分數</td>
                                     <td scope="col">到期日</td>
@@ -69,11 +72,7 @@
                                     <td scope="col">完成回報</td>
                                 </tr>
                             </thead>
-                            @php
-                                $todayTasks = $group->tasks()->today()->notExpired()->confirmed()->latest()->get();
-                                $otherTasks = $group->tasks()->confirmed()->notExpired()->get()->diff($todayTasks);
-                            @endphp
-                            @foreach ($todayTasks as $task)
+                            @foreach ($tasks->get('todayTasks') as $task)
                                 @php
                                     $confirmed = 0;
                                     $isReport = false;
@@ -110,7 +109,7 @@
                                 </tbody>
                                 @endif
                             @endforeach
-                            @foreach ($otherTasks as $task)
+                            @foreach ($tasks->get('otherTasks') as $task)
                             @php
                                 $confirmed = 0;
                                 $isReport = false;
@@ -173,7 +172,7 @@
         })
     })
 </script>
-@if ($group->categories->count() == 0)
+@if ($categories->count() == 0)
 @include('inc.addCategory')
 @endif
 @endsection

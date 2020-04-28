@@ -29,26 +29,25 @@
             data: JSON.stringify(data),
             success: (result) => {
                 const task = result.data
-                console.log(task);
                 const expiredAt = task.expired_at.split(" ")[0];
                 let param = {'id': task.id,'name': task.name,'description': task.description,'score':task.score,'expired_at': task.expiredAt,'remain_times': task.remain_times};
                 $('#success-msg').empty();
                 $('#success-msg').prepend(`任務 ${task.name} 新增成功`);
                 $('#success-msg').slideToggle();
                 $(`#current-task thead`).after(`
-                    <tbody class="table-success" id="category-${task.category.id}">
-                        <td>${task.name}</td>
-                        <td>${task.description}</td>
-                        <td>${task.score}</td>
-                        <td>${expiredAt}</td>
-                        <td class="text-center">${task.remain_times}</td>
-                        <td>
-                            <button class="btn btn-sm btn-primary" onclick="getTask(${JSON.stringify(task)})">
-                                修改
-                            </button>
-                        <td>
+                    <tbody>
+                        <tr class="table-success" id="edit-task-${task.id}">
+                            <td>${task.name}</td>
+                            <td>${task.description}</td>
+                            <td>${task.score}</td>
+                            <td>${expiredAt}</td>
+                            <td class="text-center">${task.remain_times}</td>
+                            <td><button class="btn btn-sm btn-primary" onclick="getTask()">修改</button><td>
+                        </tr>
                     </tbody>
                 `);
+                // solve the problem that the above tbody add an extra td.
+                $(`#edit-task-${task.id}`).children(':last').detach();;
                 $('#edit-task').slideDown();
 
                 apiToken();

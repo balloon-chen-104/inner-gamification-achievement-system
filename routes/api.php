@@ -21,8 +21,9 @@ Route::prefix('v1')->namespace('Api\V1')->name('api.v1.')->group(function() {
     Route::post('/token', 'UserController@updatedApi');
     Route::apiResource('task', 'TaskController');
     Route::prefix('task')->name('task.')->group(function() {
+        Route::post('/approve', 'TaskController@approveSuggestionTask')->name('approve');
         Route::post('/report', 'TaskController@report')->name('report');
-        Route::post('/confirmed', 'TaskController@getConfirmedTasks');
+        Route::post('/confirmed', 'TaskController@getConfirmedTasks')->name('confirmed');
     });
     Route::apiResource('group', 'GroupController');
     Route::apiResource('category', 'CategoryController')->only(['index', 'store']);
