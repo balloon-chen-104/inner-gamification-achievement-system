@@ -55,6 +55,25 @@ class ProfileController extends Controller
     
     public function show($id)
     {
+        // $srcfile = 'http://127.0.0.1/storage/images/'.Auth::user()->photo;
+        // $destfile = 'http://127.0.0.1/storage2/images/'.Auth::user()->photo;
+
+        // $srcfile = '../../../public/storage2/images/'.Auth::user()->photo;
+        // $destfile = '../../../public/storage3/images/'.Auth::user()->photo;
+
+        // if (!copy($srcfile, $destfile)) {
+        //     return "File cannot be copied! \n";
+        // }
+        // else {
+        //     return "File has been copied!";
+        // }
+
+
+
+
+
+
+
         $tasks = $this->getTasksInfo($id, Auth::user()->active_group);
         $userInfo = User::find($id);
 
@@ -159,25 +178,15 @@ class ProfileController extends Controller
         $scoreToNextRankRemain = 0;
         $currentScoreInThisRank = 0;
         
-        $request = Request::create('api/v1/task/confirmed', 'POST', [
-            "user_id"     => $id,
-            "group_id"    => $active_group
-        ]);
+        
+        $request = Request::create('api/v1/task/confirmed', 'POST', []);
+        $request->headers->set(
+            'Authorization', 'Bearer '.Auth::user()->api_token
+        );
         $response = app()->handle($request);
-        dd($response);
 
-        // 拿到的 $response 帶有 header
-        // 故先轉換型別成字串，去掉 header 再轉換成物件
-        // 應急作法，需修正
-        $tasks = strval($response);
-        $start = 0;
-        for($i=0 ; $i<strlen($tasks) ; $i++){
-            if($tasks[$i] == '['){
-                $start = $i;
-                break;
-            }
-        }
-        $tasks = json_decode(substr($tasks, $start));
+        $tasks = $response->getData();
+
 
         // Enter leaderboard or profile without default setting
         // (Same in SettingController: First time enter setting page without data)
