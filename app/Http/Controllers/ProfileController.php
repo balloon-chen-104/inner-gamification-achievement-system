@@ -10,7 +10,7 @@ use Auth;
 use Redirect;
 
 class ProfileController extends Controller
-{   
+{
     // define scores of rank
     private $medals = [
         50 => '銅牌III',
@@ -52,7 +52,7 @@ class ProfileController extends Controller
 
         return view('leaderboard.index')->with('users', $users);
     }
-    
+
     public function show($id)
     {
         // $srcfile = 'http://127.0.0.1/storage/images/'.Auth::user()->photo;
@@ -106,7 +106,7 @@ class ProfileController extends Controller
     {
         $tasks = $this->getTasksInfo(Auth::user()->id, Auth::user()->active_group);
         $userInfo = User::find(Auth::user()->id);
-        
+
         $data = [
             'id' => $userInfo->id,
             'name' => $userInfo->name,
@@ -135,8 +135,8 @@ class ProfileController extends Controller
     public function update(Request $request, $id)
     {
         $userInfo = User::find(Auth::user()->id);
-        
-        
+
+
         if(isset($request->photo)){
             $this->validate($request, [
                 'photo' => 'image|nullable|max:1999'
@@ -177,8 +177,8 @@ class ProfileController extends Controller
         $scoreToNextRank = 0;
         $scoreToNextRankRemain = 0;
         $currentScoreInThisRank = 0;
-        
-        
+
+
         $request = Request::create('api/v1/task/confirmed', 'POST', []);
         $request->headers->set(
             'Authorization', 'Bearer '.Auth::user()->api_token
@@ -195,11 +195,11 @@ class ProfileController extends Controller
             $today = date('Y-m-d');
             $setting = Setting::create(['cycle' => 30, 'started_at' => $today, 'group_id' => Auth::user()->active_group]);
         }
-        
+
         $startedDate = Setting::where('group_id', auth()->user()->active_group)->first()->started_at;
         $startedDate = date_create($startedDate);
         $startedDateTimestamp = $startedDate->getTimestamp();
-        
+
         if(count($tasks) != 0){
             foreach($tasks as $task){
                 $task->confirmed_at = date_create($task->confirmed_at);
@@ -212,7 +212,7 @@ class ProfileController extends Controller
                 }
                 $allScore += $task->score;
             }
-            
+            $preScore = 0;
             foreach($this->medals as $score => $rank){
                 if($allScore < $score){
                     $medal = $rank;
