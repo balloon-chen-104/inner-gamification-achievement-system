@@ -103,7 +103,7 @@
                                         @if ($isReport)
                                         <td><button class="btn btn-sm btn-secondary" disabled>待審核</button></td>
                                         @else
-                                        <td><button class="btn btn-sm btn-primary" id="report-{{$task->id}}" onclick="getTask({{ $task }})">回報</button></td>
+                                        <td><button class="btn btn-sm btn-primary" id="report-{{$task->id}}" onclick="getTask({{ $task->id }}, '{{$task->name}}')">回報</button></td>
                                         @endif
                                     </tr>
                                 </tbody>
@@ -135,7 +135,7 @@
                                         @if ($isReport)
                                         <td><button class="btn btn-sm btn-secondary" disabled>待審核</button></td>
                                         @else
-                                        <td><button class="btn btn-sm btn-primary" id="report-{{$task->id}}" onclick="getTask({{ $task }})">回報</button></td>
+                                        <td><button class="btn btn-sm btn-primary" id="report-{{$task->id}}" onclick="getTask({{ $task->id }}, '{{$task->name}}')">回報</button></td>
                                         @endif
                                     </tr>
                                 </tbody>
@@ -153,11 +153,11 @@
 </div>
 @include('inc.reportTask')
 <script>
-    function getTask(task) {
+    function getTask(id, name) {
         $('#task-name').empty();
         $('#task-report').empty();
-        $('#task-name').append(task.name);
-        $('#task-id').val(task.id);
+        $('#task-name').append(name);
+        $('#task-id').val(id);
         $('#reportTaskModalCenter').modal('toggle');
     }
     $(() => {

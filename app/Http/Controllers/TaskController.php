@@ -38,7 +38,12 @@ class TaskController extends Controller
     public function create()
     {
         $active_group = auth()->user()->active_group;
-        return view('task.taskAddEdit')->withGroup(Group::find($active_group));
+        $group = $this->group->find($active_group);
+        if($group->users()->where('users.id', auth()->user()->id)->first()->pivot->authority == 1) {
+            return view('task.taskAddEdit')->withGroup($group);
+        } else {
+            return redirect('/task');
+        }
     }
 
     /**
@@ -96,7 +101,6 @@ class TaskController extends Controller
     public function verify()
     {
         $active_group = auth()->user()->active_group;
-        // dd(auth()->user()->active_group);
         $tasks = $this->group->find($active_group)->tasks;
 
         $confirmedTasks = $tasks->filter(function($value, $key) {
@@ -121,14 +125,15 @@ class TaskController extends Controller
             return false;
         })
         ->values();
-        // dd(collect([
-        //     'confirmedTasks' => $confirmedTasks,
-        //     'notConfirmedTasks' => $notConfirmedTasks
-        // ]));
 
-        return view('task.taskVerify')->withTasks(collect([
-            'confirmedTasks' => $confirmedTasks,
-            'notConfirmedTasks' => $notConfirmedTasks
-        ]));
+        $group = $this->group->find($active_group);
+        if($group->users()->where('users.id', auth()->user()->id)->first()->pivot->authority == 1) {
+            return view('task.taskVerify')->withTasks(collect([
+                'confirmedTasks' => $confirmedTasks,
+                'notConfirmedTasks' => $notConfirmedTasks
+            ]));
+        } else {
+            return redirect('/task');
+        }
     }
 }

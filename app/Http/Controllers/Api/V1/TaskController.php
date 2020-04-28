@@ -165,11 +165,30 @@ class TaskController extends Controller
 
     public function approveSuggestionTask(Request $request)
     {
-        $request->validate(['id' => 'required']);
-        $task = $this->task->find($request->input('id'));
-        $task->confirmed = 1;
+        $request->validate([
+            'id' => 'required',
+            'confirmed' => 'required'
+        ]);
+        $task = $this->task->where('id', $request->input('id'))->with('category')->first();
+        $task->confirmed = $request->input('confirmed');
         $task->save();
         $this->updateApiToken(auth()->user());
+        return new TaskResource($task);
+    }
+
+    public function verifyTask(Request $request)
+    {
+        $request->validate([
+            'id' => 'required',
+            // 'confirmed' => 'required'
+        ]);
+        $task = $this->task->where('id', $request->input('id'))->with('category')->first();
+        $task->remain_times--;
+        $task->save();
+        $task->users()->updateExistingPivot(auth()->user()->id, [
+            'confirmed' => 1,
+            'updated_at' => Carbon::now()
+        ]);
         return new TaskResource($task);
     }
 }
