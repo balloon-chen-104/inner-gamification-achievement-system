@@ -18,44 +18,20 @@
                                 <th>姓名</th>
                                 <th>本期積分</th>
                                 <th>總積分</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>金牌3</td>
-                                <td><a href="/profile"><img src="/balloon.jpg" class="photo"></a></td>
-                                <td><a href="/profile">ＡＡＡ</a></td>
-                                <td>500</td>
-                                <td>2000</td>
-                            </tr>
-                            <tr>
-                                <td>銀牌3</td>
-                                <td><a href="/profile"><img src="/balloon.jpg" class="photo"></a></td>
-                                <td><a href="/profile">ＢＢＢ</a></td>
-                                <td>400</td>
-                                <td>1700</td>
-                            </tr>
-                            <tr>
-                                <td>銅牌1</td>
-                                <td><a href="/profile"><img src="/balloon.jpg" class="photo"></a></td>
-                                <td><a href="/profile">ＣＣＣ</a></td>
-                                <td>200</td>
-                                <td>1300</td>
-                            </tr>
-                            <tr>
-                                <td>銅牌3</td>
-                                <td><a href="/profile"><img src="/balloon.jpg" class="photo"></a></td>
-                                <td><a href="/profile">ＤＤＤ</a></td>
-                                <td>100</td>
-                                <td>1000</td>
-                            </tr>
-                            <tr>
-                                <td>銅牌1</td>
-                                <td><a href="/profile"><img src="/balloon.jpg" class="photo"></a></td>
-                                <td><a href="/profile">ＥＥＥ</a></td>
-                                <td>50</td>
-                                <td>1200</td>
-                            </tr>
+                            @foreach ($users as $user)
+                                <tr>
+                                    <td>{{ $user['medal'] }}</td>
+                                    <td><img src="/storage2/images/{{ $user['photo'] }}" class="photo"></td>
+                                    <td>{{ $user['name'] }}</td>
+                                    <td>{{ $user['periodScore'] }}</td>
+                                    <td>{{ $user['allScore'] }}</td>
+                                    <td><a href="/profile/{{$user['id']}}" class="btn btn-outline-secondary btn-sm">更多</a></td>
+                                </tr>
+                            @endforeach
                         </tbody>
                     </table>
 
