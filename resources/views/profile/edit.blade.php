@@ -15,9 +15,9 @@
                         <form action="/profile/{{ $data['id'] }}" method="post" enctype="multipart/form-data">
                             <tr>
                                 @if ($data['photo'] == 'default-photo.jpg')
-                                    <td rowspan="3" class="text-center"><img src="{{ asset('storage/images/default-photo.jpg') }}" id="photo"></td>
+                                    <td rowspan="3" class="text-center"><img src="{{ asset('storage/images/default-photo.jpg') }}" id="photo" class="preview"></td>
                                 @else
-                                    <td rowspan="3" class="text-center"><img src="{{ asset('storage/images/user_'.$data['id'].'/'.$data['photo']) }}" id="photo"></td>
+                                    <td rowspan="3" class="text-center"><img src="{{ asset('storage/images/user_'.$data['id'].'/'.$data['photo']) }}" id="photo" class="preview"></td>
                                 @endif
                                 <td>{{ $data['name'] }}</td>
                             </tr>
@@ -30,7 +30,7 @@
                             <tr>
                                 <td class="text-center">
                                     <label class="btn btn-secondary">
-                                        <input name="photo" id="upload-photo" style="display:none;" type="file">上傳照片
+                                        <input name="photo" id="upload-photo" style="display:none;" type="file" class="upload">上傳照片
                                         <i class="fas fa-check check"></i>
                                     </label>
                                 </td>
@@ -130,7 +130,21 @@
         }
 
         $('#upload-photo').click(function(){
-            $('.check').show();
+            $('.check').show('slow');
+        })
+
+        // http://jsnwork.kiiuo.com/archives/2258/jquery-javascript-教你如何製作圖片上傳前的預覽圖/
+        function preview(input) {
+            if (input.files && input.files[0]) {
+                let reader = new FileReader();
+                reader.onload = function (e) {
+                    $('.preview').attr('src', e.target.result);
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        $("body").on("change", ".upload", function (){
+            preview(this);
         })
     });
 </script>
