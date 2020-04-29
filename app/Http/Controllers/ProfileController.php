@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+// use Illuminate\Http\Request;
+use Request;
 use App\User;
 use App\Setting;
 use App\Group;
@@ -23,17 +24,22 @@ class ProfileController extends Controller
         750 => '金牌II'
     ];
 
-    // public function __construct()
-    // {
-    //     $this->middleware('auth');
-    // }
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
 
     public function index()
     {
+        // New user without any group
+        if(!isset(auth()->user()->active_group)){
+            return Redirect::to('/');
+        }
+
         $usersInGroup = Group::find(Auth::user()->active_group)->users;
         $users = [];
         foreach($usersInGroup as $user){
-            $tasks = $this->getTasksInfo($user->id, Auth::user()->active_group);
+            $tasks = $this->getTasksInfo($user->id, Auth::user()->active_group, $user->api_token);
             $users[] = [
                 'id' => $user->id,
                 'name' => $user->name,
@@ -49,14 +55,64 @@ class ProfileController extends Controller
         usort($users, function($a, $b) {
             return $b['periodScore'] <=> $a['periodScore'];
         });
-
+        
         return view('leaderboard.index')->with('users', $users);
     }
 
     public function show($id)
     {
-        $tasks = $this->getTasksInfo($id, Auth::user()->active_group);
+        $url = url()->current();
+        $i = strpos($url, 'profile/');
+        $userId = substr($url, $i);
+        $i = strpos($userId, '/');
+        $userId = substr($userId, $i+1);
+        
+        // New user without any group
+        if(!isset(auth()->user()->active_group)){
+            if($userId != Auth::user()->id){
+                return Redirect::to('/profile/'.Auth::user()->id);
+            }
+
+            $userInfo = User::find($id);
+
+            $data = [
+                'id' => $userInfo->id,
+                'name' => $userInfo->name,
+                'photo' => $userInfo->photo,
+                'email' => $userInfo->email,
+                'self_expectation' => $userInfo->self_expectation,
+                'job_title' => $userInfo->job_title,
+                'department' => $userInfo->department,
+                'office_location' => $userInfo->office_location,
+                'extension' => $userInfo->extension,
+                'photo' => $userInfo->photo
+            ];
+            return view('profile.show')->with('data', $data);
+        }
+        
+        // check if user id in this group
+        $users = Group::find(auth()->user()->active_group)->users;
+        $users_id = [];
+        foreach($users as $user){
+            $users_id[] = $user->id;
+        }
+        if(!in_array($userId, $users_id)){
+            return Redirect::to('/profile/'.Auth::user()->id);
+        }
+        
+        dump(Auth::user()->api_token);
+        $sss = Auth::user()->api_token;
+        // 呼叫 api 會改變 Auth
+        // $email = Auth::user()->email;
+        // $password = Auth::user()->password;
+        // $api_token = Auth::user()->api_token;
         $userInfo = User::find($id);
+        $tasks = $this->getTasksInfo($userInfo->api_token);
+        $sss = $this->getTasksInfo($sss);
+        // // Auth::attempt(['email' => $email, 'password' => $password]);
+        // dd(Auth::user());
+        dump(Auth::user()->api_token);
+
 
         $data = [
             'id' => $userInfo->id,
@@ -85,8 +141,40 @@ class ProfileController extends Controller
 
     public function edit()
     {
-        $tasks = $this->getTasksInfo(Auth::user()->id, Auth::user()->active_group);
+        // Check if user is in his/her own profile
+        $url = url()->current();
+        $i = strpos($url, 'profile/');
+        $id = substr($url, $i);
+        $i = strpos($id, '/');
+        $id = substr($id, $i+1);
+        $i = strpos($id, '/');
+        $id = substr($id, 0, $i);
+        if($id != Auth::user()->id){
+            return Redirect::to('/profile/'.$id);
+        }
+
+        // New user without any group
+        if(!isset(auth()->user()->active_group)){
+            $userInfo = User::find($id);
+
+            $data = [
+                'id' => $userInfo->id,
+                'name' => $userInfo->name,
+                'photo' => $userInfo->photo,
+                'email' => $userInfo->email,
+                'self_expectation' => $userInfo->self_expectation,
+                'job_title' => $userInfo->job_title,
+                'department' => $userInfo->department,
+                'office_location' => $userInfo->office_location,
+                'extension' => $userInfo->extension,
+                'photo' => $userInfo->photo
+            ];
+            return view('profile.edit')->with('data', $data);
+        }
+        
+        
         $userInfo = User::find(Auth::user()->id);
+        $tasks = $this->getTasksInfo(Auth::user()->id, Auth::user()->active_group, $userInfo->api_token);
 
         $data = [
             'id' => $userInfo->id,
@@ -148,7 +236,7 @@ class ProfileController extends Controller
         return Redirect::to("profile/$id");
     }
 
-    private function getTasksInfo($id, $active_group)
+    private function getTasksInfo($api_token)
     {
         $periodScore = 0;
         $allScore = 0;
@@ -162,7 +250,8 @@ class ProfileController extends Controller
 
         $request = Request::create('api/v1/task/confirmed', 'POST', []);
         $request->headers->set(
-            'Authorization', 'Bearer '.Auth::user()->api_token
+            // 'Authorization', 'Bearer '.Auth::user()->api_token
+            'Authorization', 'Bearer '.$api_token
         );
         $response = app()->handle($request);
 

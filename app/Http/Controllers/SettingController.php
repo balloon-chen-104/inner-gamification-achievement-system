@@ -5,11 +5,17 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Setting;
 use App\Bulletin;
+use App\Group;
 use Auth;
 use Redirect;
 
 class SettingController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+    
     /**
      * Display a listing of the resource.
      *
@@ -17,6 +23,23 @@ class SettingController extends Controller
      */
     public function index()
     {
+        // New user without any group
+        if(!isset(auth()->user()->active_group)){
+            return Redirect::to('/');
+        }
+
+        // Check if user is admin
+        $autority = 0;
+        $group_users = Group::find(Auth::user()->active_group)->users;
+        foreach($group_users as $group_user){
+            if($group_user->pivot->user_id == Auth::user()->id){
+                $autority = $group_user->pivot->authority;
+            }
+        }
+        if(!$autority){
+            return Redirect::to('/profile/'.Auth::user()->id);
+        }
+        
         // First time enter setting page without data
         $setting = Setting::where('group_id', Auth::user()->active_group)->get();
         if(!isset($setting[0])){
@@ -53,6 +76,18 @@ class SettingController extends Controller
 
     public function editCycle()
     {
+        // Check if user is admin
+        $autority = 0;
+        $group_users = Group::find(Auth::user()->active_group)->users;
+        foreach($group_users as $group_user){
+            if($group_user->pivot->user_id == Auth::user()->id){
+                $autority = $group_user->pivot->authority;
+            }
+        }
+        if(!$autority){
+            return Redirect::to('/profile/'.Auth::user()->id);
+        }
+        
         $setting = Setting::where('group_id', Auth::user()->active_group)->get();
         $bulletin = Bulletin::where('group_id', Auth::user()->active_group)->where('type', 'flash_message')->orderBy('created_at', 'desc')->get();
         $data = [
@@ -108,6 +143,18 @@ class SettingController extends Controller
      */
     public function editFlashMessage($id)
     {
+        // Check if user is admin
+        $autority = 0;
+        $group_users = Group::find(Auth::user()->active_group)->users;
+        foreach($group_users as $group_user){
+            if($group_user->pivot->user_id == Auth::user()->id){
+                $autority = $group_user->pivot->authority;
+            }
+        }
+        if(!$autority){
+            return Redirect::to('/profile/'.Auth::user()->id);
+        }
+        
         $setting = Setting::where('group_id', Auth::user()->active_group)->get();
         $bulletin = Bulletin::where('group_id', Auth::user()->active_group)->where('type', 'flash_message')->orderBy('created_at', 'desc')->get();
         $data = [
@@ -168,6 +215,18 @@ class SettingController extends Controller
 
     public function createFlashMessage()
     {
+        // Check if user is admin
+        $autority = 0;
+        $group_users = Group::find(Auth::user()->active_group)->users;
+        foreach($group_users as $group_user){
+            if($group_user->pivot->user_id == Auth::user()->id){
+                $autority = $group_user->pivot->authority;
+            }
+        }
+        if(!$autority){
+            return Redirect::to('/profile/'.Auth::user()->id);
+        }
+        
         return view('setting.createFlashMessage');
     }
 }

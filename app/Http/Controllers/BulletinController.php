@@ -10,6 +10,11 @@ use Redirect;
 
 class BulletinController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -17,6 +22,11 @@ class BulletinController extends Controller
      */
     public function index()
     {
+        // New user without any group
+        if(!isset(auth()->user()->active_group)){
+            return Redirect::to('/');
+        }
+
         $group = Group::find(auth()->user()->active_group);
         // $latestTasks = $group->tasks()->orderBy('updated_at', 'desc')->notExpired()->take(5)->get();
         $latestTasks = $group->tasks()->notExpired()->confirmed()->latest()->take(5)->get();
@@ -26,6 +36,7 @@ class BulletinController extends Controller
         $flash_messages = Bulletin::where('group_id', Auth::user()->active_group)->where('type', 'flash_message')->where('flash_message_switch', '1')->orderBy('created_at', 'desc')->get();
         $announcements = Bulletin::where('group_id', Auth::user()->active_group)->where('type', 'announcement')->orderBy('updated_at', 'desc')->get();
 
+        // Check if user is admin
         $autority = 0;
         $group_users = Group::find(Auth::user()->active_group)->users;
         foreach($group_users as $group_user){
@@ -52,6 +63,23 @@ class BulletinController extends Controller
      */
     public function create()
     {
+        // New user without any group
+        if(!isset(auth()->user()->active_group)){
+            return Redirect::to('/');
+        }
+        
+        // Check if user is admin
+        $autority = 0;
+        $group_users = Group::find(Auth::user()->active_group)->users;
+        foreach($group_users as $group_user){
+            if($group_user->pivot->user_id == Auth::user()->id){
+                $autority = $group_user->pivot->authority;
+            }
+        }
+        if(!$autority){
+            return Redirect::to('/bulletin');
+        }
+
         return view('bulletin.create');
     }
 
@@ -63,6 +91,23 @@ class BulletinController extends Controller
      */
     public function edit($id)
     {
+        // New user without any group
+        if(!isset(auth()->user()->active_group)){
+            return Redirect::to('/');
+        }
+
+        // Check if user is admin
+        $autority = 0;
+        $group_users = Group::find(Auth::user()->active_group)->users;
+        foreach($group_users as $group_user){
+            if($group_user->pivot->user_id == Auth::user()->id){
+                $autority = $group_user->pivot->authority;
+            }
+        }
+        if(!$autority){
+            return Redirect::to('/bulletin');
+        }
+        
         $bulletin = Bulletin::find($id);
         return view('bulletin.edit')->with('bulletin', $bulletin);
     }

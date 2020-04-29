@@ -50,58 +50,64 @@
     </div>
 </div>
 
-<br>
 
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-10">
-            <div class="card">
-                <div class="card-header">獎牌與積分</div>
+{{-- New user without any group --}}
+@if (isset($data['medals']))
 
-                <div class="card-body">
+    <br>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <div class="card">
+                    <div class="card-header">獎牌與積分</div>
 
-                    <table width="100%">
-                        <tr>
-                            <td width="40%"><p class="text-dark font-weight-bold">本期積分：{{ $data['periodScore'] }}</p></td>
-                            <td width="60%" class="text-center"><p class="text-dark font-weight-bold">累積積分：{{ $data['allScore'] }}</p></td>
-                        </tr>
-                        <tr>
-                            <td valign="top">
-                                @foreach ($data['completeTasksInThisPeriod'] as $completeTask)
-                                    <p class="text-dark">{{ $completeTask }}</p>
-                                @endforeach
-                            </td>
-                            <td valign="top" class="text-center">
-                                @if ($data['medals']['scoreToNextRank'] == 1)
-                                    <p>已達到最高階級</p>
-                                @else
-                                    <p class="text-dark">下一階級：{{ $data['medals']['currentScoreInThisRank'] }} / {{ $data['medals']['scoreToNextRank'] }}</p>
-                                @endif
-                                <!--Pie Chart -->
-                                @php
-                                    $percent = floor($data['medals']['currentScoreInThisRank'] / $data['medals']['scoreToNextRank'] * 100);
-                                @endphp
-                                <div class="progress-pie-chart" data-medal="{{ $data['medals']['medal'] }}" data-percent="{{ $percent }}">
-                                    <div class="ppc-progress">
-                                        <div class="ppc-progress-fill"></div>
-                                    </div>
-                                    <div class="ppc-percents">
-                                        <div class="pcc-percents-wrapper">
-                                            <span class="medal"></span>
-                                            <span class="percent"></span>
+                    <div class="card-body">
+
+                        <table width="100%">
+                            <tr>
+                                <td width="40%"><p class="text-dark font-weight-bold">本期積分：{{ $data['periodScore'] }}</p></td>
+                                <td width="60%" class="text-center"><p class="text-dark font-weight-bold">累積積分：{{ $data['allScore'] }}</p></td>
+                            </tr>
+                            <tr>
+                                <td valign="top">
+                                    @foreach ($data['completeTasksInThisPeriod'] as $completeTask)
+                                        <p class="text-dark">{{ $completeTask }}</p>
+                                    @endforeach
+                                </td>
+                                <td valign="top" class="text-center">
+                                    @if ($data['medals']['scoreToNextRank'] == 1)
+                                        <p>已達到最高階級</p>
+                                    @else
+                                        <p class="text-dark">下一階級：{{ $data['medals']['currentScoreInThisRank'] }} / {{ $data['medals']['scoreToNextRank'] }}</p>
+                                    @endif
+                                    <!--Pie Chart -->
+                                    @php
+                                        $percent = floor($data['medals']['currentScoreInThisRank'] / $data['medals']['scoreToNextRank'] * 100);
+                                    @endphp
+                                    <div class="progress-pie-chart" data-medal="{{ $data['medals']['medal'] }}" data-percent="{{ $percent }}">
+                                        <div class="ppc-progress">
+                                            <div class="ppc-progress-fill"></div>
+                                        </div>
+                                        <div class="ppc-percents">
+                                            <div class="pcc-percents-wrapper">
+                                                <span class="medal"></span>
+                                                <span class="percent"></span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <!--End Chart -->
-                            </td>
-                        </tr>
-                    </table>
+                                    <!--End Chart -->
+                                </td>
+                            </tr>
+                        </table>
 
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+
+@endif
+
 
 <!-- jQuery CDN - Slim version (=without AJAX) -->
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
