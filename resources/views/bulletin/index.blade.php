@@ -78,6 +78,10 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                @php
+                                    // 顯示的最大筆數
+                                    $count = 5;
+                                @endphp
                                 @foreach ($data['latestTasks'] as $latestTask)
                                     @php
                                         $confirmed = 0;
@@ -89,7 +93,10 @@
                                             }
                                         }
                                     @endphp
-                                    @if($confirmed == 0)
+                                    @if($confirmed == 0 && $count > 0)
+                                        @php
+                                            $count--;
+                                        @endphp
                                         <tr>
                                             <td>
                                                 {{ $latestTask->name }}

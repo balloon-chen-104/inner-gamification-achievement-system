@@ -29,7 +29,7 @@ class BulletinController extends Controller
 
         $group = Group::find(auth()->user()->active_group);
         // $latestTasks = $group->tasks()->orderBy('updated_at', 'desc')->notExpired()->take(5)->get();
-        $latestTasks = $group->tasks()->notExpired()->confirmed()->latest()->take(5)->get();
+        $latestTasks = $group->tasks()->notExpired()->confirmed()->latest()->get();
         $todayDateTime = new \DateTime();
         $todayTimeString = $todayDateTime->format('Y-m-d');
 
