@@ -17,6 +17,12 @@ class BulletinController extends Controller
      */
     public function index()
     {
+        $group = Group::find(auth()->user()->active_group);
+        // $latestTasks = $group->tasks()->orderBy('updated_at', 'desc')->notExpired()->take(5)->get();
+        $latestTasks = $group->tasks()->notExpired()->confirmed()->latest()->take(5)->get();
+        $todayDateTime = new \DateTime();
+        $todayTimeString = $todayDateTime->format('Y-m-d');
+
         $flash_messages = Bulletin::where('group_id', Auth::user()->active_group)->where('type', 'flash_message')->where('flash_message_switch', '1')->orderBy('created_at', 'desc')->get();
         $announcements = Bulletin::where('group_id', Auth::user()->active_group)->where('type', 'announcement')->orderBy('updated_at', 'desc')->get();
 
@@ -31,7 +37,9 @@ class BulletinController extends Controller
         $data = [
             'flash_messages' => $flash_messages,
             'announcements' => $announcements,
-            'autority' => $autority
+            'autority' => $autority,
+            'latestTasks' => $latestTasks,
+            'todayTimeString' => $todayTimeString
         ];
 
         return view('bulletin.index')->with('data', $data);

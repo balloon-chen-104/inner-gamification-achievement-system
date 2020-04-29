@@ -25,7 +25,11 @@
                             @foreach ($users as $user)
                                 <tr>
                                     <td>{{ $user['medal'] }}</td>
-                                    <td><img src="/storage2/images/{{ $user['photo'] }}" class="photo"></td>
+                                    @if ($user['photo'] == 'default-photo.jpg')
+                                        <td><img src="{{ asset('storage/images/default-photo.jpg') }}" class="photo"></td>
+                                    @else
+                                        <td><img src="{{ asset('storage/images/user_'.$user['id'].'/'.$user['photo']) }}" class="photo"></td>
+                                    @endif
                                     <td>{{ $user['name'] }}</td>
                                     <td>{{ $user['periodScore'] }}</td>
                                     <td>{{ $user['allScore'] }}</td>

@@ -55,25 +55,6 @@ class ProfileController extends Controller
 
     public function show($id)
     {
-        // $srcfile = 'http://127.0.0.1/storage/images/'.Auth::user()->photo;
-        // $destfile = 'http://127.0.0.1/storage2/images/'.Auth::user()->photo;
-
-        // $srcfile = '../../../public/storage2/images/'.Auth::user()->photo;
-        // $destfile = '../../../public/storage3/images/'.Auth::user()->photo;
-
-        // if (!copy($srcfile, $destfile)) {
-        //     return "File cannot be copied! \n";
-        // }
-        // else {
-        //     return "File has been copied!";
-        // }
-
-
-
-
-
-
-
         $tasks = $this->getTasksInfo($id, Auth::user()->active_group);
         $userInfo = User::find($id);
 
@@ -147,9 +128,9 @@ class ProfileController extends Controller
                 // Get just extension
                 $extension = $request->file('photo')->getClientOriginalExtension();
                 // Filename to store
-                $fileNameToStore = 'user_'.$userInfo->id.'_'.$userInfo->name.'.'.$extension;
+                $fileNameToStore = 'user_'.$userInfo->id.'_'.time().'.'.$extension;
                 // Upload Image
-                $path = $request->file('photo')->storeAs('public/images', $fileNameToStore);
+                $path = $request->file('photo')->storeAs('public/images/'.'user_'.$userInfo->id, $fileNameToStore);
             } else {
                 $fileNameToStore = 'default-photo.jpg';
             }

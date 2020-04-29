@@ -13,13 +13,11 @@
                 <div class="card-body">
                     <table class="table">
                         <tr>
-                            {{-- 上傳圖片有問題 --}}
-                            {{-- 問題1. 連結吃不到檔案 --}}
-                            {{-- 問題2. 似乎有快取問題，檔案已經更新畫面卻不會馬上更新 --}}
-                            {{-- 在 edit.blade 有一樣的問題 --}}
-                            {{-- 在 leaderboard.index.blade 有一樣的問題 --}}
-                            {{-- <td rowspan="3" class="text-center"><img src="/storage/images/{{ $data['photo'] }}" id="photo"></td> --}}
-                            <td rowspan="3" class="text-center"><img src="/storage2/images/{{ $data['photo'] }}" id="photo"></td>
+                            @if ($data['photo'] == 'default-photo.jpg')
+                                <td rowspan="3" class="text-center"><img src="{{ asset('storage/images/default-photo.jpg') }}" id="photo"></td>
+                            @else
+                                <td rowspan="3" class="text-center"><img src="{{ asset('storage/images/user_'.$data['id'].'/'.$data['photo']) }}" id="photo"></td>
+                            @endif
                             <td>{{ $data['name'] }}</td>
                         </tr>
                         <tr>

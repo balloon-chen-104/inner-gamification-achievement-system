@@ -14,8 +14,11 @@
                     <table class="table">
                         <form action="/profile/{{ $data['id'] }}" method="post" enctype="multipart/form-data">
                             <tr>
-                                {{-- <td rowspan="3" class="text-center"><img src="/storage/images/{{ $data['photo'] }}" id="photo"></td> --}}
-                                <td rowspan="3" class="text-center"><img src="/storage2/images/{{ $data['photo'] }}" id="photo"></td>
+                                @if ($data['photo'] == 'default-photo.jpg')
+                                    <td rowspan="3" class="text-center"><img src="{{ asset('storage/images/default-photo.jpg') }}" id="photo"></td>
+                                @else
+                                    <td rowspan="3" class="text-center"><img src="{{ asset('storage/images/user_'.$data['id'].'/'.$data['photo']) }}" id="photo"></td>
+                                @endif
                                 <td>{{ $data['name'] }}</td>
                             </tr>
                             <tr>
