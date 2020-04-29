@@ -2,8 +2,7 @@
 
 namespace App\Http\Controllers;
 
-// use Illuminate\Http\Request;
-use Request;
+use Illuminate\Http\Request;
 use App\User;
 use App\Setting;
 use App\Group;
@@ -39,7 +38,7 @@ class ProfileController extends Controller
         $usersInGroup = Group::find(Auth::user()->active_group)->users;
         $users = [];
         foreach($usersInGroup as $user){
-            $tasks = $this->getTasksInfo($user->id, Auth::user()->active_group, $user->api_token);
+            $tasks = $this->getTasksInfo($user->id);
             $users[] = [
                 'id' => $user->id,
                 'name' => $user->name,
@@ -99,20 +98,9 @@ class ProfileController extends Controller
         if(!in_array($userId, $users_id)){
             return Redirect::to('/profile/'.Auth::user()->id);
         }
-        
-        dump(Auth::user()->api_token);
-        $sss = Auth::user()->api_token;
-        // 呼叫 api 會改變 Auth
-        // $email = Auth::user()->email;
-        // $password = Auth::user()->password;
-        // $api_token = Auth::user()->api_token;
-        $userInfo = User::find($id);
-        $tasks = $this->getTasksInfo($userInfo->api_token);
-        $sss = $this->getTasksInfo($sss);
-        // // Auth::attempt(['email' => $email, 'password' => $password]);
-        // dd(Auth::user());
-        dump(Auth::user()->api_token);
 
+        $userInfo = User::find($id);
+        $tasks = $this->getTasksInfo($userInfo->id);
 
         $data = [
             'id' => $userInfo->id,
@@ -174,7 +162,7 @@ class ProfileController extends Controller
         
         
         $userInfo = User::find(Auth::user()->id);
-        $tasks = $this->getTasksInfo(Auth::user()->id, Auth::user()->active_group, $userInfo->api_token);
+        $tasks = $this->getTasksInfo(Auth::user()->id);
 
         $data = [
             'id' => $userInfo->id,
@@ -204,7 +192,6 @@ class ProfileController extends Controller
     public function update(Request $request, $id)
     {
         $userInfo = User::find(Auth::user()->id);
-
 
         if(isset($request->photo)){
             $this->validate($request, [
@@ -236,7 +223,7 @@ class ProfileController extends Controller
         return Redirect::to("profile/$id");
     }
 
-    private function getTasksInfo($api_token)
+    private function getTasksInfo($id)
     {
         $periodScore = 0;
         $allScore = 0;
@@ -248,11 +235,14 @@ class ProfileController extends Controller
         $currentScoreInThisRank = 0;
 
 
-        $request = Request::create('api/v1/task/confirmed', 'POST', []);
-        $request->headers->set(
-            // 'Authorization', 'Bearer '.Auth::user()->api_token
-            'Authorization', 'Bearer '.$api_token
-        );
+        $request = Request::create('api/v1/task/confirmed', 'POST', [
+            'user_id' => $id,
+            'group_id' => Auth::user()->active_group
+        ]);
+        // $request->headers->set(
+        //     // 'Authorization', 'Bearer '.Auth::user()->api_token
+        //     'Authorization', 'Bearer '.$api_token
+        // );
         $response = app()->handle($request);
 
         $tasks = $response->getData();
