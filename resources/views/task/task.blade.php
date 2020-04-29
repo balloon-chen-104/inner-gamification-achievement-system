@@ -6,9 +6,16 @@
             <div class="alert alert-my-color" id="success-msg" role="alert" style="display:none"></div>
             <div class="alert alert-danger" id="error-msg" role="alert" style="display:none"></div>
             @php
-                $categories = \App\Group::find(Auth::user()->active_group)->categories;
+                $group = \App\Group::find(Auth::user()->active_group);
+                $isAdmin = false;
+                foreach($group->users as $user) {
+                    if($user->id == Auth::user()->id && $user->pivot->authority == 1) {
+                        $isAdmin == true;
+                    }
+                }
+                $categories = $group->categories;
             @endphp
-            @if ($categories->count() == 0)
+            @if ($isAdmin && $categories->count() == 0)
             <div class="card mb-3">
                 <div class="card-header" style="cursor: pointer" onclick="toggleCategory()">新增任務種類</div>
                 <div class="card-body" id="add-category" style="display:none">

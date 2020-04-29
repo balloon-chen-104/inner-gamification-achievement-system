@@ -50,6 +50,8 @@ Route::prefix('task')->name('task.')->group(function() {
     Route::get('/verify', 'TaskController@verify')->name('verify');
     Route::get('/propose', 'TaskController@propose')->name('propose');
 });
+Route::post('/create-group', 'GroupController@store');
+Route::post('/enter-group', 'GroupController@enter');
 
 
 Route::get('/profile/{id}', 'ProfileController@show');

@@ -20,7 +20,7 @@
             <div class="card mb-3">
                 <div class="card-header" style="cursor: pointer" onclick="toggleTaskAdd()">新增任務</div>
                 <div class="card-body" style="display:none">
-                    <form id="add-task-form" method="POST">
+                    <form id="add-task-form" method="POST" data-confirmed="1">
                         @csrf
                         <div class="form-row">
                             <div class="col mr-3">

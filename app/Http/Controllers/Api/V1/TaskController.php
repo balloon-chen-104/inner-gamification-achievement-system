@@ -44,13 +44,14 @@ class TaskController extends Controller
             'category_id' => 'required',
             'expired_at' => 'required|date_format:Y-m-d',
             'score' => 'required',
-            'remain_times' => 'required'
+            'remain_times' => 'required',
+            'confirmed' => 'required'
         ]);
         $this->task->name = $request->input('name');
         $this->task->description = $request->input('description');
         $this->task->category_id = $request->input('category_id');
         $this->task->creator_id = auth()->user()->id;
-        $this->task->confirmed = 1;
+        $this->task->confirmed = $request->input('confirmed');
         $this->task->expired_at = Carbon::parse($request->input('expired_at'));
         $this->task->score = $request->input('score');
         $this->task->remain_times = $request->input('remain_times');

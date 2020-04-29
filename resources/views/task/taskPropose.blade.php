@@ -9,16 +9,16 @@
             <div class="card mb-3">
                 <div class="card-header" style="cursor: pointer" onclick="$('.card-body:eq(0)').slideToggle();">提案新任務</div>
                 <div class="card-body" style="display:none">
-                    <form id="propose-task-form" method="POST">
+                    <form id="add-task-form" data-confirmed="0" method="POST">
                         @csrf
                         <div class="form-row">
                             <div class="col mr-3">
-                                <label for="propose-task-name">任務名稱</label>
-                                <input type="text" class="form-control" id="propose-task-name">
+                                <label for="add-task-name">任務名稱</label>
+                                <input type="text" class="form-control" id="add-task-name">
                             </div>
                             <div class="col">
-                                <label for="propose-task-category">任務種類</label>
-                                <select class="custom-select" name="" id="propose-task-category">
+                                <label for="add-task-category">任務種類</label>
+                                <select class="custom-select" name="" id="add-task-category">
                                     @php
                                         $categories = \App\Group::find(Auth::user()->active_group)->categories;
                                     @endphp
@@ -34,21 +34,21 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="propose-task-description">任務內容描述</label>
-                            <textarea name="task-description" class="form-control" id="propose-task-description" cols="30" rows="2" required></textarea>
+                            <label for="add-task-description">任務內容描述</label>
+                            <textarea name="task-description" class="form-control" id="add-task-description" cols="30" rows="2" required></textarea>
                         </div>
                         <div class="form-group">
-                            <label for="propose-task-expired-at">任務到期日</label>
-                            <input type="text" class="form-control datepicker" id="propose-task-expired-at" required>
+                            <label for="add-task-expired-at">任務到期日</label>
+                            <input type="text" class="form-control datepicker" id="add-task-expired-at" required>
                         </div>
                         <div class="form-row">
                             <div class="col mr-3">
-                                <label for="propose-task-score">分數</label>
-                                <input type="number" id="propose-task-score" class="form-control" value="20" required>
+                                <label for="add-task-score">分數</label>
+                                <input type="number" id="add-task-score" class="form-control" value="20" required>
                             </div>
                             <div class="col">
-                                <label for="propose-task-remain">剩餘次數</label>
-                                <input type="number" id="propose-task-remain" class="form-control" value="20" required>
+                                <label for="add-task-remain">剩餘次數</label>
+                                <input type="number" id="add-task-remain" class="form-control" value="20" required>
                             </div>
                         </div>
                         <hr>
@@ -156,10 +156,11 @@
 </div>
 @include('inc.datePicker')
 <script>
-    // console.log($('#propose-task').has('table thead').length)
+    // console.log($('#add-task').has('table thead').length)
     $('.datepicker').datepicker({
         format: 'yyyy-mm-dd',
     });
 </script>
 @include('inc.editTask')
+@include('inc.addTask')
 @endsection

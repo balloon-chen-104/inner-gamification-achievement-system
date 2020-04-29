@@ -10,11 +10,11 @@
                 @csrf
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="name">群組名稱</label>
+                        <label for="group-name">群組名稱</label>
                         <input type="text" name="name" id="group-name" class="form-control" required>
                     </div>
                     <div class="form-group">
-                        <label for="name">群組描述</label>
+                        <label for="group-description">群組描述</label>
                         <input type="text" name="name" id="group-description" class="form-control" required>
                     </div>
                 </div>

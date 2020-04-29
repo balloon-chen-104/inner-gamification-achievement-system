@@ -160,7 +160,7 @@
                                                 <a class="dropdown-item" href="{{route('task.edit')}}">新增／修改任務</a>
                                                 <a class="dropdown-item" href="{{route('task.verify')}}">審核員工完成任務</a>
                                             @else
-                                                <a class="dropdown-item" href="#">提案新任務</a>
+                                                <a class="dropdown-item" href="{{route('task.propose')}}">提案新任務</a>
                                             @endif
                                     </li>
                                     <li class="nav-item">
