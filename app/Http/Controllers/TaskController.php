@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Task;
 use App\Group;
+use Carbon\Carbon;
 
 class TaskController extends Controller
 {
@@ -47,20 +48,8 @@ class TaskController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
      * Display the history tasks.
      *
-     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function history()
@@ -70,32 +59,9 @@ class TaskController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * View for verifying tasks in the group
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function verify()
@@ -103,7 +69,7 @@ class TaskController extends Controller
         $active_group = auth()->user()->active_group;
         $tasks = $this->group->find($active_group)->tasks;
 
-        $confirmedTasks = $tasks->filter(function($value, $key) {
+        $confirmedTasks = $tasks->filter(function($value) {
             if($value->users->count() > 0){
                 foreach($value->users as $user) {
                     if($user->pivot->confirmed == 1) {
@@ -114,7 +80,7 @@ class TaskController extends Controller
             return false;
         })
         ->values();
-        $notConfirmedTasks = $tasks->filter(function($value, $key) {
+        $notConfirmedTasks = $tasks->filter(function($value) {
             if($value->users->count() > 0){
                 foreach($value->users as $user) {
                     if($user->pivot->confirmed == 0) {
@@ -135,5 +101,29 @@ class TaskController extends Controller
         } else {
             return redirect('/task');
         }
+    }
+
+    public function propose()
+    {
+        $active_group = auth()->user()->active_group;
+        $tasks = $this->group->find($active_group)->tasks()->where('expired_at', '>', Carbon::now())->orderBy('confirmed')->get();
+        $proposed_tasks = $tasks->filter(function($task) {
+            if($task->confirmed != 1 && $task->creator_id == auth()->user()->id) {
+                return true;
+            }
+            return false;
+        })
+        ->values();
+        $passed_tasks = $tasks->filter(function($task) {
+            if($task->confirmed == 1 && $task->creator_id == auth()->user()->id) {
+                return true;
+            }
+            return false;
+        })
+        ->values();
+        return view('task.taskPropose')->withTasks(collect([
+            'proposed_tasks' => $proposed_tasks,
+            'passed_tasks' => $passed_tasks
+        ]));
     }
 }

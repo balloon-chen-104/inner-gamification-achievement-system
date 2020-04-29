@@ -29,7 +29,7 @@ class Task extends JsonResource
                 $confirmed_at = '';
                 foreach($this->users as $user) {
                     if($user->pivot->task_id == $this->id){
-                        if(auth()->user() && $user->id == auth()->user()->id){
+                        if($user->id == $request->input('user_id')){
                             $confirmed_at = $user->pivot->updated_at;
                         }
                     }

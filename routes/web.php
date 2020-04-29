@@ -48,6 +48,7 @@ Route::prefix('task')->name('task.')->group(function() {
     Route::get('/edit', 'TaskController@create')->name('edit');
     Route::get('/history', 'TaskController@history')->name('history');
     Route::get('/verify', 'TaskController@verify')->name('verify');
+    Route::get('/propose', 'TaskController@propose')->name('propose');
 });
 
 

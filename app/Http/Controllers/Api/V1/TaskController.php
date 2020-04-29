@@ -8,7 +8,6 @@ use App\Http\Resources\Tasks\Task as TaskResource;
 use App\Http\Controllers\Controller;
 use App\Task;
 use Carbon\Carbon;
-use GuzzleHttp\Promise\TaskQueue;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
@@ -19,7 +18,7 @@ class TaskController extends Controller
     public function __construct(Task $task)
     {
         $this->task = $task;
-        $this->middleware('auth:api');
+        $this->middleware('auth:api')->except('getConfirmedTasks');
     }
     /**
      * Display a listing of the resource.
@@ -89,16 +88,22 @@ class TaskController extends Controller
             'category_id' => 'required',
             'expired_at' => 'required|date_format:Y-m-d',
             'score' => 'required',
-            'remain_times' => 'required'
+            'remain_times' => 'required',
+            'confirmed' => 'required'
         ]);
         $task = $this->task->find($id);
 
+        $newConfirmed = 1;
+        if($request->input('confirmed') == -1) {
+            $newConfirmed = 0;
+        }
         $task->name = $request->input('name');
         $task->description = $request->input('description');
         $task->category_id = $request->input('category_id');
         $task->expired_at = Carbon::parse($request->input('expired_at'));
         $task->score = $request->input('score');
         $task->remain_times = $request->input('remain_times');
+        $task->confirmed = $newConfirmed;
         $task->save();
 
         $this->updateApiToken(auth()->user());
@@ -138,14 +143,18 @@ class TaskController extends Controller
         }
     }
 
-    public function getConfirmedTasks()
+    public function getConfirmedTasks(Request $request)
     {
-        if(isset(auth()->user()->active_group)) {
-            $tasks = Group::find(auth()->user()->active_group)->tasks
-                ->filter(function($value, $key) {
+        $request->validate([
+            'user_id' => 'required',
+            'group_id' => 'required'
+        ]);
+        if($request->input('group_id')!== NULL) {
+            $tasks = Group::find($request->input('group_id'))->tasks
+                ->filter(function($value) use($request) {
                     if($value->users->count() > 0){
                         foreach($value->users as $user) {
-                            if($user->id == auth()->user()->id && $user->pivot->confirmed == 1) {
+                            if($user->id == $request->input('user_id') && $user->pivot->confirmed == 1) {
                                 return true;
                             }
                         }
@@ -179,14 +188,15 @@ class TaskController extends Controller
     public function verifyTask(Request $request)
     {
         $request->validate([
-            'id' => 'required',
-            // 'confirmed' => 'required'
+            'task_id' => 'required',
+            'user_id' => 'required',
+            'confirmed' => 'required'
         ]);
-        $task = $this->task->where('id', $request->input('id'))->with('category')->first();
+        $task = $this->task->where('id', $request->input('task_id'))->with('category')->first();
         $task->remain_times--;
         $task->save();
-        $task->users()->updateExistingPivot(auth()->user()->id, [
-            'confirmed' => 1,
+        $task->users()->updateExistingPivot($request->input('user_id'), [
+            'confirmed' => $request->input('confirmed'),
             'updated_at' => Carbon::now()
         ]);
         return new TaskResource($task);

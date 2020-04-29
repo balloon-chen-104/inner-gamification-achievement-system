@@ -11,6 +11,7 @@
                 @method('PUT')
                 <div class="modal-body">
                     <input type="text" name="task-id" id="task-id" style="display: none">
+                    <input type="text" name="confirmed-status" id="confirmed-status" style="display: none">
                     <div class="form-row mb-3">
                         <div class="col mr-3">
                             <label for="task-name">任務名稱</label>
@@ -19,9 +20,12 @@
                         <div class="col">
                             <label for="task-name">任務種類</label>
                             <select class="custom-select" name="" id="task-category">
-                                @if ($group->categories->count() > 0)
+                                @php
+                                    $categories = \App\Group::find(Auth::user()->active_group)->categories;
+                                @endphp
+                                @if ($categories->count() > 0)
                                     <option value="-1" selected disabled>選擇任務種類</option>
-                                    @foreach ($group->categories as $category)
+                                    @foreach ($categories as $category)
                                     <option value="{{$category->id}}">{{$category->name}}</option>
                                     @endforeach
                                 @else
@@ -59,6 +63,25 @@
 </div>
 @auth
 <script>
+    function getTaskInEdit(e, confirmed) {
+        let tr = $(e).parent().parent()
+        let trId = tr.attr('id');
+        let categoryId = tr.data('category');
+        $('#task-name').val($(`#${trId} td:nth-child(1)`).text());
+        $('#task-description').val($(`#${trId} td:nth-child(2)`).text());
+        $('#task-score').val($(`#${trId} td:nth-child(3)`).text());
+        $('#task-expired-at').val($(`#${trId} td:nth-child(4)`).text());
+        $('#task-remain').val($(`#${trId} td:nth-child(5)`).text());
+        $('#task-id').val(trId.match(/\d+/));
+        $('#confirmed-status').val(confirmed);
+        $('#task-category').children().each(function(){
+            if($(this).val() == categoryId){
+                // $(this).attr('selected', true);
+                this.selected = true;
+            }
+        })
+        $('#editTaskModalCenter').modal('toggle');
+    }
     $(document).ready(() => {
         $("#edit-task-form").submit((event) => {
             event.preventDefault();
@@ -72,7 +95,8 @@
             'description': $('#task-description').val(),
             'expired_at': $('#task-expired-at').val(),
             'score': $('#task-score').val(),
-            'remain_times': $('#task-remain').val()
+            'remain_times': $('#task-remain').val(),
+            'confirmed': $('#confirmed-status').val()
         };
         $.ajaxSetup({
             headers: {
@@ -90,19 +114,36 @@
                 const task = result.data
                 console.log(task);
                 const expiredAt = task.expired_at.split(" ")[0];
-                let param = {'id': task.id,'name': task.name,'description': task.description,'score':task.score,'expired_at': task.expiredAt,'remain_times': task.remain_times};
                 $('#success-msg').empty();
-                $('#success-msg').prepend(`任務已修改`);
+                $('#success-msg').prepend(`任務已修改後重新提交`);
                 $('#success-msg').slideToggle();
-                $(`#edit-task-${task.id}`).empty().append(`
-                    <td>${task.name}</td>
-                    <td>${task.description}</td>
-                    <td>${task.score}</td>
-                    <td>${expiredAt}</td>
-                    <td class="text-center">${task.remain_times}</td>
-                `);
-                $(`#edit-task-${task.id}`).append('<td><button class="btn btn-sm btn-primary"' +
-                    'onclick="getTask(' + JSON.stringify(param) + ')">修改</button></td>');
+                $(`#edit-task-${task.id}`).empty();
+                if($('#confirmed-status').val() == 1){
+                    $(`#edit-task-${task.id}`).append(`
+                        <td>${task.name}</td>
+                        <td>${task.description}</td>
+                        <td>${task.score}</td>
+                        <td>${expiredAt}</td>
+                        <td class="text-center">${task.remain_times}</td>
+                        <td><button class="btn btn-sm btn-primary" onclick="getTaskInEdit(this, 1)">修改</button></td>
+                    `);
+                } else {
+                    $(`#edit-task-${task.id}`).append(`
+                        <td>${task.name}</td>
+                        <td>${task.description}</td>
+                        <td>${task.score}</td>
+                        <td>${expiredAt}</td>
+                        <td class="text-center">${task.remain_times}</td>
+                        <td>
+                            <span class="badge badge-primary">提案審核中</span>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-secondary" disabled>
+                                修改
+                            </button>
+                        </td>
+                    `)
+                }
 
                 $('#editTaskModalCenter').modal('toggle');
                 apiToken();

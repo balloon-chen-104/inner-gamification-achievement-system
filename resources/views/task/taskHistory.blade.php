@@ -37,7 +37,7 @@
                         </select>
                     </div> --}}
                     @if ($group->tasks()->expired()->get()->count() > 0)
-                        <table class="table table-striped">
+                        <table class="table table-hover">
                             <thead class="thead-light">
                                 <tr>
                                     <td scope="col">任務名</td>
@@ -48,9 +48,9 @@
                                     <td scope="col">完成回報</td>
                                 </tr>
                             </thead>
-                            @foreach ($group->tasks()->expired()->get() as $task)
-                            <tbody id="category-{{$task->category_id}}">
-                                <tr>
+                            <tbody>
+                                @foreach ($group->tasks()->expired()->get() as $task)
+                                <tr data-category="{{$task->category_id}}">
                                     <td>{{ $task->name }}</td>
                                     <td>{{ $task->description }}</td>
                                     <td>{{ $task->score }}</td>
@@ -62,8 +62,8 @@
                                     <td>{{ $task->remain_times }}</td>
                                     <td><button class="btn btn-sm btn-secondary" disabled>回報</button></td>
                                 </tr>
+                                @endforeach
                             </tbody>
-                            @endforeach
                         </table>
                     @else
                     <hr class="mt-5">
@@ -79,10 +79,11 @@
         $('#catInputGroupSelect').change(() => {
             let selected = $("#catInputGroupSelect").find(":selected").val();
             if(selected > 0) {
-                $('tbody').hide();
-                $(`tbody#category-${$("#catInputGroupSelect").find(":selected").val()}`).show();
+                $('tr').hide();
+                $('thead tr').show();
+                $(`tbody tr[data-category=${$("#catInputGroupSelect").find(":selected").val()}]`).show();
             }else if(selected < 0) {
-                $('tbody').show();
+                $('tr').show();
             }
         })
     })
