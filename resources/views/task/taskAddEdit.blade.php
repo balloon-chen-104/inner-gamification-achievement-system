@@ -3,7 +3,7 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-10">
-            <div class="alert alert-success" id="success-msg" role="alert" style="display:none"></div>
+            <div class="alert alert-my-color" id="success-msg" role="alert" style="display:none"></div>
             <div class="alert alert-danger" id="error-msg" role="alert" style="display:none"></div>
             <div class="card mb-3">
                 <div class="card-header" style="cursor: pointer" onclick="toggleCategory()">新增任務種類</div>
@@ -68,23 +68,23 @@
                 <div class="card-header" style="cursor: pointer" onclick="toggleTaskPropose()">審查員工任務提案</div>
                 <div class="card-body" style="display:none">
                     @if ($group->tasks()->notConfirmed()->notExpired()->get()->count() > 0)
-                        <table class="table table-striped">
+                        <table class="table table-hover">
                             <thead class="thead-light">
                                 <tr>
-                                    <td scope="col">任務名</td>
-                                    <td scope="col">敘述</td>
-                                    <td scope="col">分數</td>
-                                    <td scope="col">到期日</td>
-                                    <td scope="col">剩餘次數</td>
-                                    <td scope="col">確認提案</td>
+                                    <th scope="col">任務名</td>
+                                    <th scope="col">敘述</td>
+                                    <th scope="col">分數</td>
+                                    <th scope="col">到期日</td>
+                                    <th scope="col">剩餘次數</td>
+                                    <th scope="col">確認提案</td>
                                 </tr>
                             </thead>
                             @php
                                 $todayTasks = $group->tasks()->today()->notExpired()->notConfirmed()->latest()->get();
                                 $otherTasks = $group->tasks()->notConfirmed()->notExpired()->get()->diff($todayTasks);
                             @endphp
-                            @foreach ($todayTasks as $task)
                             <tbody>
+                                @foreach ($todayTasks as $task)
                                 <tr class="table-info" id="approve-task-{{$task->id}}">
                                     <td>{{ $task->name }}</td>
                                     <td>{{ $task->description }}</td>
@@ -96,18 +96,16 @@
                                     }}</td>
                                     <td class="text-center">{{ $task->remain_times }}</td>
                                     <td>
-                                        <button class="btn btn-sm btn-primary" onclick="approveSuggestionTask({{$task->id}}, 1)">
+                                        <button class="btn btn-sm btn-primary" onclick="approveSuggestionTask(this, {{$task->id}}, 1)">
                                             確認
                                         </button>
-                                        <button class="btn btn-sm btn-secondary"  onclick="approveSuggestionTask({{$task->id}}, -1)">
+                                        <button class="btn btn-sm btn-secondary"  onclick="approveSuggestionTask(this, {{$task->id}}, -1)">
                                             駁回
                                         </button>
                                     </td>
                                 </tr>
-                            </tbody>
-                            @endforeach
-                            @foreach ($otherTasks as $task)
-                            <tbody>
+                                @endforeach
+                                @foreach ($otherTasks as $task)
                                 <tr id="approve-task-{{$task->id}}">
                                     <td>{{ $task->name }}</td>
                                     <td>{{ $task->description }}</td>
@@ -119,16 +117,16 @@
                                     }}</td>
                                     <td class="text-center">{{ $task->remain_times }}</td>
                                     <td>
-                                        <button class="btn btn-sm btn-primary" onclick="approveSuggestionTask({{$task->id}}, 1)">
+                                        <button class="btn btn-sm btn-primary" onclick="approveSuggestionTask(this, {{$task->id}}, 1)">
                                             確認
                                         </button>
-                                        <button class="btn btn-sm btn-secondary" onclick="approveSuggestionTask({{$task->id}}, -1)">
+                                        <button class="btn btn-sm btn-secondary" onclick="approveSuggestionTask(this, {{$task->id}}, -1)">
                                             駁回
                                         </button>
                                     </td>
                                 </tr>
+                                @endforeach
                             </tbody>
-                            @endforeach
                         </table>
                     @else
                         目前沒有任何提案
@@ -139,24 +137,24 @@
                 <div class="card-header" style="cursor: pointer" onclick="toggleTaskEdit()">修改目前已有任務</div>
                 <div class="card-body" style="display:none">
                     @if ($group->tasks()->confirmed()->notExpired()->get()->count() > 0)
-                        <table class="table table-striped" id="current-task">
+                        <table class="table table-hover" id="current-task">
                             <thead class="thead-light">
                                 <tr>
-                                    <td scope="col">任務名</td>
-                                    <td scope="col">敘述</td>
-                                    <td scope="col">分數</td>
-                                    <td scope="col">到期日</td>
-                                    <td scope="col">剩餘次數</td>
-                                    <td scope="col">修改任務</td>
+                                    <th scope="col">任務名</td>
+                                    <th scope="col">敘述</td>
+                                    <th scope="col">分數</td>
+                                    <th scope="col">到期日</td>
+                                    <th scope="col">剩餘次數</td>
+                                    <th scope="col">修改任務</td>
                                 </tr>
                             </thead>
                             @php
                                 $todayTasks = $group->tasks()->today()->notExpired()->confirmed()->latest()->get();
                                 $otherTasks = $group->tasks()->confirmed()->notExpired()->get()->diff($todayTasks);
                             @endphp
-                            @foreach ($todayTasks as $task)
-                            <tbody id="category-{{$task->category_id}}">
-                                <tr class="table-info" id="edit-task-{{$task->id}}">
+                            <tbody>
+                                @foreach ($todayTasks as $task)
+                                <tr class="table-info" data-category="{{$task->category_id}}" id="edit-task-{{$task->id}}">
                                     <td>{{ $task->name }}</td>
                                     <td>{{ $task->description }}</td>
                                     <td>{{ $task->score }}</td>
@@ -167,16 +165,14 @@
                                     }}</td>
                                     <td class="text-center">{{ $task->remain_times }}</td>
                                     <td>
-                                        <button class="btn btn-sm btn-primary" onclick="getTask(this)">
+                                        <button class="btn btn-sm btn-primary" onclick="getTaskInEdit(this, 1)">
                                             修改
                                         </button>
                                     </td>
                                 </tr>
-                            </tbody>
-                            @endforeach
-                            @foreach ($otherTasks as $task)
-                            <tbody id="category-{{$task->category_id}}">
-                                <tr id="edit-task-{{$task->id}}">
+                                @endforeach
+                                @foreach ($otherTasks as $task)
+                                <tr id="edit-task-{{$task->id}}" data-category="{{$task->category_id}}">
                                     <td>{{ $task->name }}</td>
                                     <td>{{ $task->description }}</td>
                                     <td>{{ $task->score }}</td>
@@ -187,13 +183,13 @@
                                     }}</td>
                                     <td class="text-center">{{ $task->remain_times }}</td>
                                     <td>
-                                        <button class="btn btn-sm btn-primary" onclick="getTask(this)">
+                                        <button class="btn btn-sm btn-primary" onclick="getTaskInEdit(this, 1)">
                                             修改
                                         </button>
                                     </td>
                                 </tr>
+                                @endforeach
                             </tbody>
-                            @endforeach
                         </table>
                     @else
                         目前沒有任何任務
@@ -210,23 +206,6 @@
     $('.datepicker').datepicker({
         format: 'yyyy-mm-dd',
     });
-    function getTask(e) {
-        let tr = $(e).parent().parent()
-        let trId = tr.attr('id');
-        let tbodyId = tr.parent('tbody').attr('id');
-        $('#task-name').val($(`#${trId} td:nth-child(1)`).text());
-        $('#task-description').val($(`#${trId} td:nth-child(2)`).text());
-        $('#task-score').val($(`#${trId} td:nth-child(3)`).text());
-        $('#task-expired-at').val($(`#${trId} td:nth-child(4)`).text());
-        $('#task-remain').val($(`#${trId} td:nth-child(5)`).text());
-        $('#task-id').val(trId.match(/\d+/));
-        $('#task-category').children().each(function(){
-            if($(this).val() == tbodyId.match(/\d+/)){
-                $(this).attr('selected', true);
-            }
-        })
-        $('#editTaskModalCenter').modal('toggle');
-    }
     function toggleCategory() {
         $('.card-body:eq(0)').slideToggle();
     }

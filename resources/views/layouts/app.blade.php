@@ -38,6 +38,9 @@
             display: block;
             transition: all .8s linear;
         }
+        .alert-my-color {
+            background-color: rgba(115, 134, 213,  0.2);
+        }
     </style>
 </head>
 <body>

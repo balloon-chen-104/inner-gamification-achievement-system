@@ -3,7 +3,7 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-10">
-            <div class="alert alert-success" id="success-msg" role="alert" style="display:none"></div>
+            <div class="alert alert-my-color" id="success-msg" role="alert" style="display:none"></div>
             <div class="alert alert-danger" id="error-msg" role="alert" style="display:none"></div>
             @php
                 $categories = \App\Group::find(Auth::user()->active_group)->categories;
@@ -61,17 +61,18 @@
                         </select>
                     </div> --}}
                     @if ($tasks->get('todayTasks')->count() > 0 || $tasks->get('otherTasks')->count() > 0)
-                        <table class="table table-striped">
+                        <table class="table table-hover">
                             <thead class="thead-light">
                                 <tr>
-                                    <td scope="col">任務名</td>
-                                    <td scope="col">敘述</td>
-                                    <td scope="col">分數</td>
-                                    <td scope="col">到期日</td>
-                                    <td scope="col">剩餘次數</td>
-                                    <td scope="col">完成回報</td>
+                                    <th scope="col">任務名</td>
+                                    <th scope="col">敘述</td>
+                                    <th scope="col">分數</td>
+                                    <th scope="col">到期日</td>
+                                    <th scope="col">剩餘次數</td>
+                                    <th scope="col">完成回報</td>
                                 </tr>
                             </thead>
+                            <tbody>
                             @foreach ($tasks->get('todayTasks') as $task)
                                 @php
                                     $confirmed = 0;
@@ -84,8 +85,8 @@
                                     }
                                 @endphp
                                 @if($confirmed == 0)
-                                <tbody id="category-{{$task->category_id}}">
-                                    <tr class="table-info">
+                                {{-- <tbody id="category-{{$task->category_id}}"> --}}
+                                    <tr class="table-info" data-category="{{$task->category_id}}">
                                         <td>
                                             {{ $task->name }}
                                             <span class="badge badge-danger" style="font-size: 10px">
@@ -103,26 +104,25 @@
                                         @if ($isReport)
                                         <td><button class="btn btn-sm btn-secondary" disabled>待審核</button></td>
                                         @else
-                                        <td><button class="btn btn-sm btn-primary" id="report-{{$task->id}}" onclick="getTask({{ $task->id }}, '{{$task->name}}')">回報</button></td>
+                                        <td><button class="btn btn-sm btn-primary" id="report-{{$task->id}}" onclick="getTaskInReport({{ $task->id }}, '{{$task->name}}')">回報</button></td>
                                         @endif
                                     </tr>
-                                </tbody>
                                 @endif
-                            @endforeach
-                            @foreach ($tasks->get('otherTasks') as $task)
-                            @php
-                                $confirmed = 0;
-                                $isReport = false;
-                                foreach($task->users as $user) {
-                                    if($user->pivot->user_id == Auth::user()->id && $user->pivot->task_id == $task->id) {
-                                        $isReport = true;
-                                        $confirmed = $user->pivot->confirmed;
+                                @endforeach
+                                @foreach ($tasks->get('otherTasks') as $task)
+                                @php
+                                    $confirmed = 0;
+                                    $isReport = false;
+                                    foreach($task->users as $user) {
+                                        if($user->pivot->user_id == Auth::user()->id && $user->pivot->task_id == $task->id) {
+                                            $isReport = true;
+                                            $confirmed = $user->pivot->confirmed;
+                                        }
                                     }
-                                }
-                            @endphp
+                                @endphp
                                 @if ($confirmed == 0)
-                                <tbody id="category-{{$task->category_id}}">
-                                    <tr>
+                                {{-- <tbody id="category-{{$task->category_id}}"> --}}
+                                    <tr data-category="{{$task->category_id}}">
                                         <td>{{ $task->name }}</td>
                                         <td>{{ $task->description }}</td>
                                         <td>{{ $task->score }}</td>
@@ -135,12 +135,12 @@
                                         @if ($isReport)
                                         <td><button class="btn btn-sm btn-secondary" disabled>待審核</button></td>
                                         @else
-                                        <td><button class="btn btn-sm btn-primary" id="report-{{$task->id}}" onclick="getTask({{ $task->id }}, '{{$task->name}}')">回報</button></td>
+                                        <td><button class="btn btn-sm btn-primary" id="report-{{$task->id}}" onclick="getTaskInReport({{ $task->id }}, '{{$task->name}}')">回報</button></td>
                                         @endif
                                     </tr>
-                                </tbody>
                                 @endif
-                            @endforeach
+                                @endforeach
+                            </tbody>
                         </table>
                     @else
                         <hr class="mt-5">
@@ -153,7 +153,7 @@
 </div>
 @include('inc.reportTask')
 <script>
-    function getTask(id, name) {
+    function getTaskInReport(id, name) {
         $('#task-name').empty();
         $('#task-report').empty();
         $('#task-name').append(name);
@@ -164,10 +164,11 @@
         $('#catInputGroupSelect').change(() => {
             let selected = $("#catInputGroupSelect").find(":selected").val();
             if(selected > 0) {
-                $('tbody').hide();
-                $(`tbody#category-${$("#catInputGroupSelect").find(":selected").val()}`).show();
+                $('tr').hide();
+                $('thead tr').show();
+                $(`tbody tr[data-category=${$("#catInputGroupSelect").find(":selected").val()}]`).show();
             }else if(selected < 0) {
-                $('tbody').show();
+                $('tr').show();
             }
         })
     })
