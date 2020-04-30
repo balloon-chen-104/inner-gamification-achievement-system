@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Group;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Str;
 
 class GroupController extends Controller
@@ -38,7 +39,8 @@ class GroupController extends Controller
 
         $user->active_group = $this->group->id;
         $user->save();
-        return view('bulletin.index');
+
+        return Redirect::to("bulletin");
     }
 
     public function enter(Request $request)
@@ -53,7 +55,7 @@ class GroupController extends Controller
 
         $user->active_group = $group->id;
         $user->save();
-        return view('bulletin.index');
 
+        return Redirect::to("bulletin");
     }
 }

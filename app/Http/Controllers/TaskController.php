@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Task;
 use App\Group;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Gate;
 
 class TaskController extends Controller
 {
@@ -25,6 +26,9 @@ class TaskController extends Controller
      */
     public function index()
     {
+        if(Gate::denies('users.viewAny', auth()->user())) {
+            return redirect('/');
+        }
         $group = $this->group->find(auth()->user()->active_group);
         $todayTasks = $group->tasks()->today()->notExpired()->confirmed()->latest()->get();
         $otherTasks = $group->tasks()->confirmed()->notExpired()->get()->diff($todayTasks);
@@ -38,13 +42,13 @@ class TaskController extends Controller
      */
     public function create()
     {
-        $active_group = auth()->user()->active_group;
-        $group = $this->group->find($active_group);
-        if($group->users()->where('users.id', auth()->user()->id)->first()->pivot->authority == 1) {
-            return view('task.taskAddEdit')->withGroup($group);
-        } else {
+        // check if is authority
+        if(Gate::denies('users.viewAuthority', auth()->user())) {
             return redirect('/task');
         }
+        $active_group = auth()->user()->active_group;
+        $group = $this->group->find($active_group);
+        return view('task.taskAddEdit')->withGroup($group);
     }
 
     /**
@@ -54,6 +58,9 @@ class TaskController extends Controller
      */
     public function history()
     {
+        if(Gate::denies('users.viewAny', auth()->user())) {
+            return redirect('/');
+        }
         $active_group = auth()->user()->active_group;
         return view('task.taskHistory')->withGroup(Group::find($active_group));
     }
@@ -66,6 +73,10 @@ class TaskController extends Controller
      */
     public function verify()
     {
+        // check if is authority
+        if(Gate::denies('users.viewAuthority', auth()->user())) {
+            return redirect('/task');
+        }
         $active_group = auth()->user()->active_group;
         $tasks = $this->group->find($active_group)->tasks;
 
@@ -91,20 +102,19 @@ class TaskController extends Controller
             return false;
         })
         ->values();
+        return view('task.taskVerify')->withTasks(collect([
+            'confirmedTasks' => $confirmedTasks,
+            'notConfirmedTasks' => $notConfirmedTasks
+        ]));
 
-        $group = $this->group->find($active_group);
-        if($group->users()->where('users.id', auth()->user()->id)->first()->pivot->authority == 1) {
-            return view('task.taskVerify')->withTasks(collect([
-                'confirmedTasks' => $confirmedTasks,
-                'notConfirmedTasks' => $notConfirmedTasks
-            ]));
-        } else {
-            return redirect('/task');
-        }
     }
 
     public function propose()
     {
+        // check if is authority
+        if(Gate::allows('users.viewAuthority', auth()->user())) {
+            return redirect('/task/verify');
+        }
         $active_group = auth()->user()->active_group;
         $tasks = $this->group->find($active_group)->tasks()->where('expired_at', '>', Carbon::now())->orderBy('confirmed')->get();
         $proposed_tasks = $tasks->filter(function($task) {
