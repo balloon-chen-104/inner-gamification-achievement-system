@@ -55,7 +55,11 @@
                             <div class="col-md-8 offset-md-4">
                                 <button type="submit" class="btn btn-primary">
                                     {{ __('登入') }}
-                                </button>
+                                </button>&nbsp
+
+                                <a href="login/azure" class="btn btn-primary">
+                                    微軟登入
+                                </a>
 
                                 @if (Route::has('password.request'))
                                     <a class="btn btn-link" href="#">

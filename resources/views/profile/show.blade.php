@@ -45,14 +45,14 @@
                                 <td class="info-td">部門</td>
                                 <td class="info-td">{{ $data['department'] }}</td>
                             </tr>
-                            <tr>
+                            {{-- <tr>
                                 <td class="info-td">辦公室</td>
                                 <td class="info-td">{{ $data['office_location'] }}</td>
                             </tr>
                             <tr>
                                 <td class="info-td">分機</td>
                                 <td class="info-td">{{ $data['extension'] }}</td>
-                            </tr>
+                            </tr> --}}
                         </table>
                     </div>
 
@@ -151,10 +151,6 @@
                 $('.ppc-percents .percent').html(percent+'%');
             }
 
-            $("img").hover(function(){
-                $('#info').toggle();
-            });
-
             $("#see-more-btn").click(function(){
                 event.preventDefault();
                 $('#see-more-btn').hide();
@@ -164,6 +160,12 @@
     </script>
 
 @endif
+
+<script>
+    $("img").hover(function(){
+        $('#info').toggle();
+    });
+</script>
 
 <style>
     #photo {

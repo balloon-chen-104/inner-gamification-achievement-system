@@ -60,3 +60,7 @@ Route::put('/profile/{id}', 'ProfileController@update');
 
 // Route::get('/leaderboard', 'LeaderboardController@index');
 Route::get('/leaderboard', 'ProfileController@index');
+
+// Microsoft Azure API for login
+Route::get('login/{provider}', 'Auth\LoginController@redirectToProvider');
+Route::get('login/{provider}/callback', 'Auth\LoginController@handleProviderCallback');
