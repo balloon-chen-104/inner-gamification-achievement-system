@@ -1,0 +1,67 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "內部遊戲化成就系統",
+        "description": "給內部同仁使用的遊戲化成就系統",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://127.0.0.1",
+            "description": "本機伺服器"
+        }
+    ],
+    "paths": {
+        "/api/v1/flashMessage": {
+            "post": {
+                "tags": [
+                    "Flash Message"
+                ],
+                "summary": "新增",
+                "description": "新增一則新的快訊，type 只接受 flash_message 否則回傳 false",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "description": "name to store",
+                                        "type": "string",
+                                        "nullable": "false"
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "example": {
+                                "type": "flash_message",
+                                "content": "最新快訊！！！"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "新增快訊成功"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": {
+                            "api_key": "UTY7IplIoZsvrxrXr4hehyYBi1KRF0ZaHkoHCMScvnvslaotkDOTxMIYCledD63p82lfpa6RNJmVpivP"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Flash Message",
+            "description": "新增快訊"
+        }
+    ],
+    "externalDocs": {
+        "description": "Github 連結",
+        "url": "https://github.com/balloon-chen-104/inner-gamification-achievement-system"
+    }
+}

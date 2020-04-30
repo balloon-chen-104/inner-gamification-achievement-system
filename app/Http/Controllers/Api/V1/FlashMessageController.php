@@ -14,7 +14,25 @@ class FlashMessageController extends Controller
     {
         $this->middleware('auth:api');
     }
-    
+
+    /**
+     * @OA\Post(
+     *     path="/api/v1/flashMessage",
+     *     tags={"Flash Message"},
+     *     summary="新增",
+     *     description="新增一則新的快訊，type 只接受 flash_message 否則回傳 false",
+     *     @OA\RequestBody(
+     *         @OA\JsonContent(
+     *             @OA\Property(property="name", type="string", description="name to store", nullable="false"),
+     *             example={"type": "flash_message", "content": "最新快訊！！！"}
+     *         ),
+     *     ),
+     *     @OA\Response(response=201, description="新增快訊成功"),
+     *         security={
+     *             {"bearerAuth": {"api_key": "UTY7IplIoZsvrxrXr4hehyYBi1KRF0ZaHkoHCMScvnvslaotkDOTxMIYCledD63p82lfpa6RNJmVpivP"}}
+     *     }
+     * )
+     */
     /**
      * Store a newly created resource in storage.
      *

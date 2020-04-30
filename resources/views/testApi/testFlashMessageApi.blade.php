@@ -24,7 +24,8 @@
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
-                "Authorization": "Bearer {{ Auth::user()->api_token }}"
+                // "Authorization": "Bearer {{ Auth::user()->api_token }}"
+                "Authorization": "Bearer " + $("#api-token").val()
             }
         });
         $.ajax({
@@ -41,6 +42,7 @@
                     "group_id: "+bulletin.group_id+"\n"+
                     "user_id: "+bulletin.user_id
                 );
+                apiToken();
             },
             error: (e) => {
                 console.log("ERROR: ", e);
