@@ -20,15 +20,6 @@ class TaskController extends Controller
         $this->task = $task;
         $this->middleware('auth:api')->except('getConfirmedTasks');
     }
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -38,6 +29,7 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
+        dd($request);
         $request->validate([
             'name' => 'required',
             'description' => 'required',
@@ -63,16 +55,6 @@ class TaskController extends Controller
         return new TaskResource($this->task->where('id', $id)->with('category')->first());
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
@@ -112,17 +94,6 @@ class TaskController extends Controller
         return new TaskResource($task->where('id', $id)->with('category')->first());
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
-
     public function report(Request $request)
     {
         $request->validate([
@@ -144,7 +115,7 @@ class TaskController extends Controller
         }
     }
 
-    public function getConfirmedTasks(Request $request)
+    public function getConfirmed(Request $request)
     {
         $request->validate([
             'user_id' => 'required',
@@ -173,7 +144,7 @@ class TaskController extends Controller
         return TaskResource::collection($tasks);
     }
 
-    public function approveSuggestionTask(Request $request)
+    public function approveSuggestion(Request $request)
     {
         $request->validate([
             'id' => 'required',
@@ -186,7 +157,7 @@ class TaskController extends Controller
         return new TaskResource($task);
     }
 
-    public function verifyTask(Request $request)
+    public function verify(Request $request)
     {
         $request->validate([
             'task_id' => 'required',

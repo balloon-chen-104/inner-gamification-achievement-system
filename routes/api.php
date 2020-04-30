@@ -19,15 +19,15 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 Route::prefix('v1')->namespace('Api\V1')->name('api.v1.')->group(function() {
     Route::post('/token', 'UserController@updatedApi');
-    Route::apiResource('task', 'TaskController');
+    Route::apiResource('task', 'TaskController')->only(['update', 'store']);
     Route::prefix('task')->name('task.')->group(function() {
-        Route::post('/approve', 'TaskController@approveSuggestionTask')->name('approve');
+        Route::post('/approve', 'TaskController@approveSuggestion')->name('approve');
         Route::post('/report', 'TaskController@report')->name('report');
-        Route::post('/verify', 'TaskController@verifyTask')->name('verify');
-        Route::post('/confirmed', 'TaskController@getConfirmedTasks')->name('confirmed');
+        Route::post('/verify', 'TaskController@verify')->name('verify');
+        Route::post('/confirmed', 'TaskController@getConfirmed')->name('confirmed');
     });
-    Route::apiResource('group', 'GroupController');
     Route::apiResource('category', 'CategoryController')->only(['index', 'store']);
+    Route::apiResource('group', 'GroupController')->only('store');
     Route::prefix('group')->name('group.')->group(function() {
         Route::post('/enter', 'GroupController@enter')->name('enter');
     });
