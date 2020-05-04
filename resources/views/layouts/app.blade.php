@@ -212,7 +212,9 @@
 
     <script src="https://cdn.ckeditor.com/4.14.0/standard/ckeditor.js"></script>
     <script>
-        CKEDITOR.replace( 'bulletin-ckeditor' );
+        if(typeof $('#bulletin-ckeditor').attr('id') == 'string'){
+            CKEDITOR.replace( 'bulletin-ckeditor' );
+        }
     </script>
 
 </body>

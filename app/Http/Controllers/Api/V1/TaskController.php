@@ -29,7 +29,6 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
-        dd($request);
         $request->validate([
             'name' => 'required',
             'description' => 'required',
@@ -94,6 +93,44 @@ class TaskController extends Controller
         return new TaskResource($task->where('id', $id)->with('category')->first());
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/v1/task/report",
+     *     tags={"Tasks"},
+     *     summary="回報任務",
+     *     description="",
+     *     @OA\Parameter(
+     *          name="id",
+     *          in="path",
+     *          description="task id",
+     *          required=true,
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *     @OA\Parameter(
+     *          name="report",
+     *          in="path",
+     *          description="report",
+     *          required=true,
+     *          @OA\Schema(
+     *              type="string"
+     *          )
+     *      ),
+     *     @OA\RequestBody(
+     *         @OA\JsonContent(
+     *             @OA\Property(property="name", type="string", description="name to store", nullable="false"),
+     *             example={"id": 1, "report": "task 1 is done!"}
+     *         ),
+     *     ),
+     *     @OA\Response(response=201, description="successful operation"),
+     *     security={
+     *         {
+     *             "passport": {}
+     *         }
+     *     }
+     * )
+     */
     public function report(Request $request)
     {
         $request->validate([

@@ -159,7 +159,8 @@
     // console.log($('#add-task').has('table thead').length)
     $('.datepicker').datepicker({
         format: 'yyyy-mm-dd',
-    });
+        startDate: 'now',
+    })
 </script>
 @include('inc.editTask')
 @include('inc.addTask')

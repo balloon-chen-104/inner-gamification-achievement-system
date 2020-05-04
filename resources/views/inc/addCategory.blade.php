@@ -29,7 +29,14 @@ function addCategory(){
             $('#success-msg').slideToggle();
             $('#category-name').val('');
             toggleCategory();
-            if($('.custom-select').val() != undefined) {
+            console.log($('.custom-select').find(":selected").val())
+            if($('.custom-select').find(":selected").val() == 0) {
+                $('.custom-select').empty();
+                $('.custom-select').append(`
+                    <option value="-1">全部（預設）</option>
+                    <option value="${category.id}">${category.name}</option>
+                `);
+            }else {
                 $('.custom-select').append(`<option value="${category.id}">${category.name}</option>
                 `);
             }

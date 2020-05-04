@@ -36,7 +36,12 @@
                         @endif
                         </select>
                     </div> --}}
-                    @if ($group->tasks()->expired()->get()->count() > 0)
+                    @php
+                        $noRemainTasks = $group->tasks()->noRemain()->get();
+                        $expiredTasks = $group->tasks()->expired()->get()->diff($noRemainTasks);
+                        $tasks = $noRemainTasks->merge($expiredTasks);
+                    @endphp
+                    @if ($tasks->count() > 0)
                         <table class="table table-hover">
                             <thead class="thead-light">
                                 <tr>
@@ -49,7 +54,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($group->tasks()->expired()->get() as $task)
+                                @foreach ($tasks as $task)
                                 <tr data-category="{{$task->category_id}}">
                                     <td>{{ $task->name }}</td>
                                     <td>{{ $task->description }}</td>
