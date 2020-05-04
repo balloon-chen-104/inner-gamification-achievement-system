@@ -19,8 +19,8 @@ class CreateTasksTable extends Migration
             $table->foreignId('creator_id');
             $table->string('name', 20);
             $table->string('description', 100);
-            $table->tinyInteger('score')->unsigned();
-            $table->tinyInteger('remain_times');
+            $table->integer('score')->unsigned();
+            $table->tinyInteger('remain_times')->unsigned();
             $table->dateTime('expired_at');
             $table->boolean('confirmed');
             $table->timestamps();

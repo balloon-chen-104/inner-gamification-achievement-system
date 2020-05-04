@@ -118,6 +118,7 @@
                 $('#success-msg').prepend(`任務已修改後重新提交`);
                 $('#success-msg').slideToggle();
                 $(`#edit-task-${task.id}`).empty();
+                $(`#edit-task-${task.id}`).data('category', task.category.id)
                 if($('#confirmed-status').val() == 1){
                     $(`#edit-task-${task.id}`).append(`
                         <td>${task.name}</td>

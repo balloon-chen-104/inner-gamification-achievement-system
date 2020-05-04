@@ -10,7 +10,7 @@
                 $isAdmin = false;
                 foreach($group->users as $user) {
                     if($user->id == Auth::user()->id && $user->pivot->authority == 1) {
-                        $isAdmin == true;
+                        $isAdmin = true;
                     }
                 }
                 $categories = $group->categories;

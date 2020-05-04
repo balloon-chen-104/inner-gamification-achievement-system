@@ -9,10 +9,6 @@ class UserPolicy
 {
     use HandlesAuthorization;
 
-    public function before(User $user)
-    {
-        return $user->active_group != NULL;
-    }
     /**
      * Determine whether the user has active group.
      *
@@ -32,11 +28,13 @@ class UserPolicy
      */
     public function viewAuthority(User $user)
     {
-        foreach($user->groups as $group) {
-            if($group->id == $user->active_group && $group->pivot->authority == 1){
-                return true;
-            }
-        }
+        // foreach($user->groups as $group) {
+        //     if($group->id == $user->active_group && $group->pivot->authority == 1){
+        //         return true;
+        //     }
+        // }
+        $group = $user->groups()->where('groups.id', $user->active_group)->first();
+        return $group->pivot->authority == 1;
         return false;
     }
 }

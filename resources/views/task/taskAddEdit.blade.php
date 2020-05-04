@@ -80,8 +80,8 @@
                                 </tr>
                             </thead>
                             @php
-                                $todayTasks = $group->tasks()->today()->notExpired()->notConfirmed()->latest()->get();
-                                $otherTasks = $group->tasks()->notConfirmed()->notExpired()->get()->diff($todayTasks);
+                                $todayTasks = $group->tasks()->today()->notExpired()->remain()->notConfirmed()->latest()->get();
+                                $otherTasks = $group->tasks()->notConfirmed()->notExpired()->remain()->get()->diff($todayTasks);
                             @endphp
                             <tbody>
                                 @foreach ($todayTasks as $task)

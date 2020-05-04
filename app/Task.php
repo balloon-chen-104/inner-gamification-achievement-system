@@ -31,6 +31,16 @@ class Task extends Model
         return $query->where('tasks.'. static::CREATED_AT, '>', Carbon::today());
     }
 
+    public function scopeRemain(Builder $query)
+    {
+        return $query->where('remain_times', '>', 0);
+    }
+
+    public function scopeNoRemain(Builder $query)
+    {
+        return $query->where('remain_times', '=', 0);
+    }
+
     public function scopeConfirmed(Builder $query)
     {
         return $query->where('confirmed', 1);

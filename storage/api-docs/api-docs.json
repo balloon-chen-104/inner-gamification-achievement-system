@@ -52,6 +52,66 @@
                     }
                 ]
             }
+        },
+        "/api/v1/task/report": {
+            "post": {
+                "tags": [
+                    "Tasks"
+                ],
+                "summary": "回報任務",
+                "description": "",
+                "operationId": "App\\Http\\Controllers\\Api\\V1\\TaskController::report",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "task id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "report",
+                        "in": "path",
+                        "description": "report",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "description": "name to store",
+                                        "type": "string",
+                                        "nullable": "false"
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "example": {
+                                "id": 1,
+                                "report": "task 1 is done!"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "successful operation"
+                    }
+                },
+                "security": [
+                    {
+                        "passport": []
+                    }
+                ]
+            }
         }
     },
     "tags": [

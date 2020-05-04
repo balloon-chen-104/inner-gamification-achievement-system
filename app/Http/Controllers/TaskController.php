@@ -30,25 +30,9 @@ class TaskController extends Controller
             return redirect('/');
         }
         $group = $this->group->find(auth()->user()->active_group);
-        $todayTasks = $group->tasks()->today()->notExpired()->confirmed()->latest()->get();
-        $otherTasks = $group->tasks()->confirmed()->notExpired()->get()->diff($todayTasks);
+        $todayTasks = $group->tasks()->today()->notExpired()->remain()->confirmed()->latest()->get();
+        $otherTasks = $group->tasks()->confirmed()->notExpired()->remain()->get()->diff($todayTasks);
         return view('task.task')->withTasks(collect(['todayTasks' => $todayTasks, 'otherTasks' => $otherTasks]));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        // check if is authority
-        if(Gate::denies('users.viewAuthority', auth()->user())) {
-            return redirect('/task');
-        }
-        $active_group = auth()->user()->active_group;
-        $group = $this->group->find($active_group);
-        return view('task.taskAddEdit')->withGroup($group);
     }
 
     /**
@@ -66,6 +50,24 @@ class TaskController extends Controller
     }
 
     /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        if(Gate::denies('users.viewAny', auth()->user())) {
+            return redirect('/');
+        }
+        if(Gate::denies('users.viewAuthority', auth()->user())){
+            return redirect('/task');
+        }
+        $active_group = auth()->user()->active_group;
+        $group = $this->group->find($active_group);
+        return view('task.taskAddEdit')->withGroup($group);
+    }
+
+    /**
      * View for verifying tasks in the group
      *
      *
@@ -73,8 +75,10 @@ class TaskController extends Controller
      */
     public function verify()
     {
-        // check if is authority
-        if(Gate::denies('users.viewAuthority', auth()->user())) {
+        if(Gate::denies('users.viewAny', auth()->user())) {
+            return redirect('/');
+        }
+        if(Gate::denies('users.viewAuthority', auth()->user())){
             return redirect('/task');
         }
         $active_group = auth()->user()->active_group;
@@ -111,8 +115,10 @@ class TaskController extends Controller
 
     public function propose()
     {
-        // check if is authority
-        if(Gate::allows('users.viewAuthority', auth()->user())) {
+        if(Gate::denies('users.viewAny', auth()->user())) {
+            return redirect('/');
+        }
+        if(Gate::allows('users.viewAuthority', auth()->user())){
             return redirect('/task/verify');
         }
         $active_group = auth()->user()->active_group;
