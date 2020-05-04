@@ -239,10 +239,10 @@ class ProfileController extends Controller
             'user_id' => $id,
             'group_id' => Auth::user()->active_group
         ]);
-        // $request->headers->set(
-        //     // 'Authorization', 'Bearer '.Auth::user()->api_token
-        //     'Authorization', 'Bearer '.$api_token
-        // );
+        $request->headers->set(
+            'Authorization', 'Bearer '.Auth::user()->api_token
+            // 'Authorization', 'Bearer '.$api_token
+        );
         $response = app()->handle($request);
 
         $tasks = $response->getData();
