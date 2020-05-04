@@ -77,4 +77,5 @@ class ProfileTest extends TestCase
 
         $response->assertStatus(302);
     }
+
 }
