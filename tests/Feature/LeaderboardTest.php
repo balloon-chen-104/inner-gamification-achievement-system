@@ -14,10 +14,7 @@ class LeaderboardTest extends TestCase
     public function testRedirectWhenUserIsNotLogin()
     {
         $response = $this->get('/leaderboard');
-        $response->assertStatus(302);
-
-        $response = $this->get('/login');
-        $response->assertStatus(200);
+        $response->assertRedirect('/login');
     }
 
     public function testRedirectWhenUserWithoutActiveGroup()
@@ -48,15 +45,35 @@ class LeaderboardTest extends TestCase
                  ->assertSeeText($user->name);
     }
 
-    // 尚未完成1
     public function testDisplyLeaderboardIndexWithSortedRecords()
     {
-        $response = $this->get('/');
+        $user1 = $this->user();
+        $user2 = $this->user();
+        Auth::login($user1, true);
+        
+        $group = $this->group($user1->id);
+        $group->users()->attach($user1->id, ['authority' => 1]);
+        $group->users()->attach($user2->id, ['authority' => 0]);
 
-        $response->assertStatus(302);
+        $user1->active_group = $group->id;
+        $user1->save();
+        $user2->active_group = $group->id;
+        $user2->save();
+
+        $category = $this->category($group->id);
+        $task = $this->task($category->id, $user1->id);
+        $task->confirmed = 1;
+        $task->save();
+        $task->users()->attach($user2->id, ['confirmed' => 1]);
+
+        $response = $this->get('/leaderboard');
+        $response->assertStatus(200)
+                 ->assertSeeText($user1->name)
+                 ->assertSeeText($user2->name)
+                 ->assertSeeTextInOrder([$user2->name, $user1->name], $escaped = true);
     }
 
-    // 尚未完成2#
+    // 尚未完成
     public function testRedirectToProfileButton()
     {
         $response = $this->get('/');

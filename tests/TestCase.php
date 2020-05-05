@@ -7,6 +7,7 @@ use App\Group;
 use App\Bulletin;
 use App\Category;
 use App\Task;
+use App\Setting;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
@@ -18,12 +19,16 @@ abstract class TestCase extends BaseTestCase
         return factory(User::class)->create();
     }
 
-    public function group($creator_id)
+    public function group($creator_id = 0)
     {
-        $group = factory(Group::class)->create();
-        $group->creator_id = $creator_id;
-        $group->save();
-
+        $group = factory(Group::class)->create([
+            'creator_id' => 1
+        ]);
+        if($creator_id != 0){
+            $group->creator_id = $creator_id;
+            $group->save();
+        }
+        
         return $group;
     }
 
@@ -45,7 +50,9 @@ abstract class TestCase extends BaseTestCase
 
     public function category($group_id = 0)
     {
-        $category = factory(Category::class)->create();
+        $category = factory(Category::class)->create([
+            'group_id' => Group::first()->id
+        ]);
         if($group_id != 0){
             $category->group_id = $group_id;
             $category->save();
@@ -53,18 +60,42 @@ abstract class TestCase extends BaseTestCase
         return $category;
     }
 
-    public function task($category_id = 0)
+    public function task($category_id = 0, $creator_id = 0, $days = 0)
     {
-        $task = factory(Task::class)->create();
+        $task = factory(Task::class)->create([
+            'category_id' => Category::first()->id,
+            'creator_id' => $this->user()->id
+        ]);
+        
         if($category_id != 0){
             $task->category_id = $category_id;
             $task->save();
         }
-
-        $task->expired_at = date_add(date_create($task->created_at), date_interval_create_from_date_string('2 days'));
+        if($creator_id != 0){
+            $task->creator_id = $creator_id;
+            $task->save();
+        }
+        
+        $task->expired_at = date_add(date_create($task->created_at), date_interval_create_from_date_string(($days + 2) . ' days'));
         $task->save();
-
+        
         return $task;
+    }
+
+    public function setting($group_id = 0)
+    {
+        $setting = Setting::create([
+            'cycle' => 30,
+            'started_at' => date('Y-m-d'),
+            'group_id' => '1'
+        ]);
+
+        if($group_id != 0){
+            $setting->group_id = $group_id;
+            $setting->save();
+        }
+
+        return $setting;
     }
 
     public function groupHarbor()

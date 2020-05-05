@@ -54,7 +54,7 @@ class UserTest extends TestCase
         $this->assertEquals(Auth::user()->id, $user->id);
     }
 
-    // 尚未完成1#
+    // 尚未完成
     public function testUserLoginViaAzure()
     {
         $response = $this->get('/login/azure');

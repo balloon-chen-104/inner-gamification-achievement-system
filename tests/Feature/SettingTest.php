@@ -14,10 +14,7 @@ class SettingTest extends TestCase
     public function testRedirectWhenUserIsNotLogin()
     {
         $response = $this->get('/setting');
-        $response->assertStatus(302);
-
-        $response = $this->get('/login');
-        $response->assertStatus(200);
+        $response->assertRedirect('/login');
     }
 
     public function testRedirectWhenUserWithoutActiveGroup()
@@ -63,7 +60,6 @@ class SettingTest extends TestCase
         $response->assertStatus(302);
     }
 
-    // 尚未完成1
     public function testDisplySettingEditCyclePage()
     {
         $user = $this->user();
@@ -76,12 +72,10 @@ class SettingTest extends TestCase
         $user->save();
 
         $response = $this->get('/setting/editCycle');
-        $response->assertStatus(500);
-        // $response->assertStatus(200)
-        //          ->assertDontSeeText('群組ID');
+        $response->assertStatus(200)
+                 ->assertDontSeeText('群組ID');
     }
 
-    // 尚未完成2
     public function testSettingEditCycleUpdate()
     {
         $user = $this->user();
@@ -93,30 +87,18 @@ class SettingTest extends TestCase
         $user->active_group = $group->id;
         $user->save();
 
+        $setting = $this->setting($group->id);
 
         $params = [
-            'cycle' => 30
+            'cycle' => 10
         ];
 
-        $this->get("/setting/editCycle")
-             ->assertStatus(500);
-
-        // $this->put("/setting/updateCycle", $params)
-        //      ->assertStatus(302);
+        $this->put("/setting/updateCycle", $params)
+             ->assertStatus(302);
         
-        // $this->assertDatabaseMissing('bulletins', $bulletin->toArray());
-
-        // $this->assertDatabaseHas('bulletins', [
-        //     'type' => 'announcement',
-        //     'content' => 'test announcement update',
-        //     'group_id' => $group->id,
-        //     'user_id' => $user->id
-        // ]);
-
-
-
-        // $response = $this->get('/setting/editCycle');
-        // $response->assertStatus(500);
+        $this->assertDatabaseHas('settings', [
+            'cycle' => 10
+        ]);
     }
 
     public function testDisplySettingIndexWithoutFlashMessage()
@@ -184,7 +166,7 @@ class SettingTest extends TestCase
                  ->assertSeeText('新增快訊');
     }
 
-    // 尚未完成3
+    // 尚未完成
     public function testSettingCreateFlashMessageStore()
     {
         $response = $this->get('/');
@@ -209,7 +191,6 @@ class SettingTest extends TestCase
         $response->assertStatus(302);
     }
 
-    // 尚未完成4
     public function testDisplySettingEditFlashMessagePage()
     {
         $user = $this->user();
@@ -224,20 +205,37 @@ class SettingTest extends TestCase
         $bulletin = $this->bulletin('flash_message', 'test flash_message', $user->id, $group->id);
         
         $response = $this->get("setting/{$bulletin->id}/editFlashMessage");
-        $response->assertStatus(500);
-        // $response->assertStatus(200);
-                //  ->assertSeeText('test flash_message');
+        $response->assertStatus(200)
+                 ->assertSeeText('返回');
     }
 
-    // 尚未完成5
     public function testSettingEditFlashMessageUpdate()
     {
-        $response = $this->get('/');
+        $user = $this->user();
+        Auth::login($user, true);
+        
+        $group = $this->group($user->id);
+        $group->users()->attach($user->id, ['authority' => 1]);
 
-        $response->assertStatus(302);
+        $user->active_group = $group->id;
+        $user->save();
+
+        $setting = $this->setting($group->id);
+        $bulletin = $this->bulletin('flash_message', 'test flash_message', $user->id, $group->id);
+
+        $params = [
+            'flashMessage' => 'test flash_message updated'
+        ];
+
+        $this->put("setting/{$bulletin->id}/updateFlashMessage", $params)
+             ->assertStatus(302);
+        
+        $this->assertDatabaseHas('bulletins', [
+            'content' => 'test flash_message updated'
+        ]);
     }
 
-    // 尚未完成6
+    // 尚未完成
     public function testSettingIndexCloseFlashMessage()
     {
         $response = $this->get('/');
@@ -245,7 +243,7 @@ class SettingTest extends TestCase
         $response->assertStatus(302);
     }
 
-    // 尚未完成7# (total unsolved:12)
+    // 尚未完成
     public function testSettingIndexOpenFlashMessage()
     {
         $response = $this->get('/');

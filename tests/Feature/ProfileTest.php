@@ -7,7 +7,6 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use Auth;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 
 class ProfileTest extends TestCase
 {
@@ -16,10 +15,7 @@ class ProfileTest extends TestCase
     public function testRedirectWhenUserIsNotLogin()
     {
         $response = $this->get('/profile/1');
-        $response->assertStatus(302);
-
-        $response = $this->get('/login');
-        $response->assertStatus(200);
+        $response->assertRedirect('/login');
     }
 
     public function testRedirectWhenUserWithoutActiveGroup()
@@ -124,34 +120,32 @@ class ProfileTest extends TestCase
                  ->assertSeeText('self_expectation update');
     }
 
-    // 尚未完成1#
     public function testProfileEditPhotoUpdate()
     {
-        Storage::fake('avatars');
         $file = UploadedFile::fake()->image('avatar.jpg');
-        
-        
-        
+
         $user = $this->user();
         Auth::login($user, true);
 
-        // $params = [
-        //     'photo' => $file
-        // ];
-
-        // $this->put("/profile/{$user->id}", $params)
-        //      ->assertStatus(302);
-        
-        $response = $this->json('PUT', "/profile/{$user->id}", [
+        $params = [
             'photo' => $file,
-        ]);
-        
-        $this->assertDatabaseHas('users', [
+            'self_expectation' => 'self_expectation update'
+        ];
+
+        $this->put("/profile/{$user->id}", $params)
+             ->assertStatus(302);
+
+        $this->assertDatabaseMissing('users', [
             'photo' => 'default-photo.jpg'
         ]);
 
+        $this->assertDatabaseHas('users', [
+            'self_expectation' => 'self_expectation update'
+        ]);
+
         $response = $this->get("/profile/{$user->id}");
-        $response->assertStatus(200);
+        $response->assertStatus(200)
+                 ->assertSeeText('self_expectation update');
     }
 
     public function testDisplyProfileIndexWithTasksInfo()

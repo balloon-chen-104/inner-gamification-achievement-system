@@ -13,8 +13,8 @@ class TaskVerifyTest extends TestCase
     
     public function testRedirectWhenUserIsNotLogin()
     {
-        $response = $this->get('/');
-        $response->assertStatus(302);
+        $response = $this->get('/task/verify');
+        $response->assertRedirect('/login');
     }
 
     public function testRedirectWhenUserWithoutActiveGroup()
@@ -22,7 +22,7 @@ class TaskVerifyTest extends TestCase
         $user = $this->user();
         Auth::login($user, true);
         
-        $response = $this->get('/setting');
+        $response = $this->get('/task/verify');
         $response->assertStatus(302);
 
         $response = $this->get('/');
@@ -32,22 +32,44 @@ class TaskVerifyTest extends TestCase
 
     public function testRedirectWhenUserIsNotAdmin()
     {
-        $response = $this->get('/');
-        $response->assertStatus(302);
+        $user = $this->user();
+        Auth::login($user, true);
+        
+        $group = $this->group($user->id);
+        $group->users()->attach($user->id, ['authority' => 0]);
+
+        $user->active_group = $group->id;
+        $user->save();
+
+        $response = $this->get('/task/verify');
+        $response->assertRedirect('/task');
     }
 
     public function testDisplyTaskProposeWithNoDatas()
     {
-        $response = $this->get('/');
-        $response->assertStatus(302);
+        $user = $this->user();
+        Auth::login($user, true);
+        
+        $group = $this->group($user->id);
+        $group->users()->attach($user->id, ['authority' => 1]);
+
+        $user->active_group = $group->id;
+        $user->save();
+
+        $response = $this->get('/task/verify');
+        $response->assertStatus(200)
+                 ->assertSeeText('目前沒有待審核任務')
+                 ->assertSeeText('目前沒有人完成任務');
     }
 
+    // 尚未完成
     public function testPassTask()
     {
         $response = $this->get('/');
         $response->assertStatus(302);
     }
 
+    // 尚未完成
     public function testTurnDownTask()
     {
         $response = $this->get('/');

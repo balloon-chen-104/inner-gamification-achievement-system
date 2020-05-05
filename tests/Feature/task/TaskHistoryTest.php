@@ -13,8 +13,8 @@ class TaskHistoryTest extends TestCase
     
     public function testRedirectWhenUserIsNotLogin()
     {
-        $response = $this->get('/');
-        $response->assertStatus(302);
+        $response = $this->get('/task/history');
+        $response->assertRedirect('/login');
     }
 
     public function testRedirectWhenUserWithoutActiveGroup()
@@ -22,7 +22,7 @@ class TaskHistoryTest extends TestCase
         $user = $this->user();
         Auth::login($user, true);
         
-        $response = $this->get('/setting');
+        $response = $this->get('/task/history');
         $response->assertStatus(302);
 
         $response = $this->get('/');
@@ -32,14 +32,36 @@ class TaskHistoryTest extends TestCase
 
     public function testDisplyTaskHistoryWithNoDatas()
     {
-        $response = $this->get('/');
-        $response->assertStatus(302);
+        $user = $this->user();
+        Auth::login($user, true);
+        
+        $group = $this->group($user->id);
+        $group->users()->attach($user->id, ['authority' => 1]);
+
+        $user->active_group = $group->id;
+        $user->save();
+
+        $response = $this->get('/task/history');
+        $response->assertStatus(200)
+                 ->assertSeeText('目前沒有已到期任務');
     }
 
     public function testDisplyTaskHistoryWithTasks()
     {
-        // 看到回報，不能點
-        $response = $this->get('/');
-        $response->assertStatus(302);
+        $user = $this->user();
+        Auth::login($user, true);
+        
+        $group = $this->group($user->id);
+        $group->users()->attach($user->id, ['authority' => 1]);
+        $category = $this->category($group->id);
+        $task = $this->task($category->id, $user->id, -2);
+        $task->confirmed = 1;
+        $task->save();
+        $user->active_group = $group->id;
+        $user->save();
+
+        $response = $this->get('/task/history');
+        $response->assertStatus(200)
+                 ->assertSeeText($task->name);
     }
 }

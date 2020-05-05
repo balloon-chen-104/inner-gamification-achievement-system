@@ -13,8 +13,8 @@ class TaskProposeTest extends TestCase
     
     public function testRedirectWhenUserIsNotLogin()
     {
-        $response = $this->get('/');
-        $response->assertStatus(302);
+        $response = $this->get('/task/propose');
+        $response->assertRedirect('/login');
     }
 
     public function testRedirectWhenUserWithoutActiveGroup()
@@ -22,7 +22,7 @@ class TaskProposeTest extends TestCase
         $user = $this->user();
         Auth::login($user, true);
         
-        $response = $this->get('/setting');
+        $response = $this->get('/task/propose');
         $response->assertStatus(302);
 
         $response = $this->get('/');
@@ -32,22 +32,43 @@ class TaskProposeTest extends TestCase
 
     public function testRedirectWhenUserIsAdmin()
     {
-        $response = $this->get('/');
-        $response->assertStatus(302);
+        $user = $this->user();
+        Auth::login($user, true);
+        
+        $group = $this->group($user->id);
+        $group->users()->attach($user->id, ['authority' => 1]);
+
+        $user->active_group = $group->id;
+        $user->save();
+
+        $response = $this->get('/task/propose');
+        $response->assertRedirect('/task/verify');
     }
 
     public function testDisplyTaskProposeWithNoDatas()
     {
-        $response = $this->get('/');
-        $response->assertStatus(302);
+        $user = $this->user();
+        Auth::login($user, true);
+        
+        $group = $this->group($user->id);
+        $group->users()->attach($user->id, ['authority' => 0]);
+
+        $user->active_group = $group->id;
+        $user->save();
+
+        $response = $this->get('/task/propose');
+        $response->assertStatus(200)
+                 ->assertSeeText('目前沒有任何任務');
     }
 
+    // 尚未完成
     public function testProposeTask()
     {
         $response = $this->get('/');
         $response->assertStatus(302);
     }
 
+    // 尚未完成
     public function testEditTurnDownTask()
     {
         $response = $this->get('/');
@@ -56,7 +77,22 @@ class TaskProposeTest extends TestCase
 
     public function testDisplyTaskProposeWithPassProposeTask()
     {
-        $response = $this->get('/');
-        $response->assertStatus(302);
+        $user = $this->user();
+        Auth::login($user, true);
+        
+        $group = $this->group($user->id);
+        $group->users()->attach($user->id, ['authority' => 0]);
+        $category = $this->category($group->id);
+        $task = $this->task($category->id, $user->id);
+        $task->confirmed = 1;
+        $task->save();
+        $user->active_group = $group->id;
+        $user->save();
+        
+        $response = $this->get('/task/propose');
+
+        $response->assertStatus(200)
+                 ->assertSeeText($task->name)
+                 ->assertSeeText('已通過');
     }
 }

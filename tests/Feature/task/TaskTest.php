@@ -13,8 +13,8 @@ class TaskTest extends TestCase
     
     public function testRedirectWhenUserIsNotLogin()
     {
-        $response = $this->get('/');
-        $response->assertStatus(302);
+        $response = $this->get('/task');
+        $response->assertRedirect('/login');
     }
 
     public function testRedirectWhenUserWithoutActiveGroup()
@@ -22,7 +22,7 @@ class TaskTest extends TestCase
         $user = $this->user();
         Auth::login($user, true);
         
-        $response = $this->get('/setting');
+        $response = $this->get('/task');
         $response->assertStatus(302);
 
         $response = $this->get('/');
@@ -32,25 +32,77 @@ class TaskTest extends TestCase
 
     public function testDisplyTaskWithNoDatas()
     {
-        $response = $this->get('/');
-        $response->assertStatus(302);
+        $user = $this->user();
+        Auth::login($user, true);
+        
+        $group = $this->group($user->id);
+        $group->users()->attach($user->id, ['authority' => 1]);
+
+        $user->active_group = $group->id;
+        $user->save();
+
+        $response = $this->get('/task');
+        $response->assertStatus(200);
     }
 
     public function testDisplyTaskWithUncompletedTasks()
     {
-        $response = $this->get('/');
-        $response->assertStatus(302);
+        $user = $this->user();
+        Auth::login($user, true);
+        
+        $group = $this->group($user->id);
+        $group->users()->attach($user->id, ['authority' => 1]);
+        $category = $this->category($group->id);
+        $task = $this->task($category->id, $user->id);
+        $task->confirmed = 1;
+        $task->save();
+        $user->active_group = $group->id;
+        $user->save();
+
+        $response = $this->get('/task');
+        $response->assertStatus(200)
+                 ->assertSeeText('回報');
     }
 
-    public function testDisplyTaskWithCompletedTasks()
+    public function testDisplyTaskWithReportedTasks()
     {
-        $response = $this->get('/');
-        $response->assertStatus(302);
+        $user = $this->user();
+        Auth::login($user, true);
+        
+        $group = $this->group($user->id);
+        $group->users()->attach($user->id, ['authority' => 1]);
+        $category = $this->category($group->id);
+        $task = $this->task($category->id, $user->id);
+        $task->confirmed = 1;
+        $task->save();
+        $user->active_group = $group->id;
+        $user->save();
+
+        $task->users()->attach($user->id, ['confirmed' => 0]);
+
+        $response = $this->get('/task');
+        $response->assertStatus(200)
+                 ->assertSeeText('任務審核中');
     }
 
     public function testDisplyTaskWithTurnDownTasks()
     {
-        $response = $this->get('/');
-        $response->assertStatus(302);
+        $user = $this->user();
+        Auth::login($user, true);
+        
+        $group = $this->group($user->id);
+        $group->users()->attach($user->id, ['authority' => 1]);
+        $category = $this->category($group->id);
+        $task = $this->task($category->id, $user->id);
+        $task->confirmed = 1;
+        $task->save();
+        $user->active_group = $group->id;
+        $user->save();
+
+        $task->users()->attach($user->id, ['confirmed' => -1]);
+
+        $response = $this->get('/task');
+        $response->assertStatus(200)
+                 ->assertSeeText('任務遭駁回');
     }
 }

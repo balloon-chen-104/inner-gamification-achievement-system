@@ -88,6 +88,13 @@ class SettingController extends Controller
             return Redirect::to('/profile/'.Auth::user()->id);
         }
         
+        // First time enter setting page without data
+        $setting = Setting::where('group_id', Auth::user()->active_group)->get();
+        if(!isset($setting[0])){
+            $today = date('Y-m-d');
+            $setting = Setting::create(['cycle' => 30, 'started_at' => $today, 'group_id' => Auth::user()->active_group]);
+        }
+        
         $setting = Setting::where('group_id', Auth::user()->active_group)->get();
         $bulletin = Bulletin::where('group_id', Auth::user()->active_group)->where('type', 'flash_message')->orderBy('created_at', 'desc')->get();
         $data = [
@@ -153,6 +160,13 @@ class SettingController extends Controller
         }
         if(!$autority){
             return Redirect::to('/profile/'.Auth::user()->id);
+        }
+        
+        // First time enter setting page without data
+        $setting = Setting::where('group_id', Auth::user()->active_group)->get();
+        if(!isset($setting[0])){
+            $today = date('Y-m-d');
+            $setting = Setting::create(['cycle' => 30, 'started_at' => $today, 'group_id' => Auth::user()->active_group]);
         }
         
         $setting = Setting::where('group_id', Auth::user()->active_group)->get();

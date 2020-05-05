@@ -14,10 +14,7 @@ class BulletinTest extends TestCase
     public function testBulletinIndexRedirectWhenUserIsNotLogin()
     {
         $response = $this->get('/bulletin');
-        $response->assertStatus(302);
-
-        $response = $this->get('/login');
-        $response->assertStatus(200);
+        $response->assertRedirect('/login');
     }
 
     public function testBulletinIndexRedirectWhenUserWithoutActiveGroup()
@@ -68,7 +65,7 @@ class BulletinTest extends TestCase
                  ->assertSeeText('test content');
     }
 
-    // 尚未完成1#
+    // 尚未完成
     public function testDisplyBulletinIndexCloseFlashMessage()
     {
         $response = $this->get('/');
