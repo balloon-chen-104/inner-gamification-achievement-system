@@ -23,7 +23,7 @@ abstract class TestCase extends BaseTestCase
         $group = factory(Group::class)->create();
         $group->creator_id = $creator_id;
         $group->save();
-        
+
         return $group;
     }
 
@@ -39,7 +39,7 @@ abstract class TestCase extends BaseTestCase
         $bulletin->user_id = $user_id;
         $bulletin->group_id = $group_id;
         $bulletin->save();
-        
+
         return $bulletin;
     }
 
@@ -52,7 +52,7 @@ abstract class TestCase extends BaseTestCase
         }
         return $category;
     }
-    
+
     public function task($category_id = 0)
     {
         $task = factory(Task::class)->create();
@@ -60,10 +60,43 @@ abstract class TestCase extends BaseTestCase
             $task->category_id = $category_id;
             $task->save();
         }
-        
+
         $task->expired_at = date_add(date_create($task->created_at), date_interval_create_from_date_string('2 days'));
         $task->save();
-        
+
         return $task;
+    }
+
+    public function groupHarbor()
+    {
+        return factory(Group::class)->create([
+            'creator_id' => 1
+        ]);
+    }
+
+    public function categoryHarbor()
+    {
+        $this->groupHarbor();
+        return factory(Category::class)->create([
+            'group_id' => Group::first()->id
+        ]);
+    }
+
+    public function taskHarbor()
+    {
+        $this->categoryHarbor();
+        return factory(Task::class)->create([
+            'category_id' => Category::first()->id,
+            'creator_id' => $this->user()->id
+        ]);
+    }
+
+    public function userWithActiveGroup()
+    {
+        $this->groupHarbor();
+        $group = Group::first();
+        return factory(User::class)->create([
+            'active_group' => $group->id
+        ]);
     }
 }

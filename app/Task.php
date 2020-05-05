@@ -23,12 +23,12 @@ class Task extends Model
 
     public function scopeLatest(Builder $query)
     {
-        return $query->orderBy('tasks.'.static::CREATED_AT, 'desc');
+        return $query->orderBy('tasks.'.static::UPDATED_AT, 'desc');
     }
 
     public function scopeToday(Builder $query)
     {
-        return $query->where('tasks.'. static::CREATED_AT, '>', Carbon::today());
+        return $query->where('tasks.'. static::UPDATED_AT, '>', Carbon::today());
     }
 
     public function scopeRemain(Builder $query)

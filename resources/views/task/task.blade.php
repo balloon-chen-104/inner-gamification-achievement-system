@@ -34,7 +34,7 @@
                 }
             </script>
             @endif
-            <div class="card">
+            <div class="card mb-3">
                 <div class="card-header">任務欄</div>
                 <div class="card-body">
                     <div class="float-right input-group input-group-sm mb-3" style="width:23ch">
@@ -67,92 +67,212 @@
                         @endif
                         </select>
                     </div> --}}
-                    @if ($tasks->get('todayTasks')->count() > 0 || $tasks->get('otherTasks')->count() > 0)
-                        <table class="table table-hover">
-                            <thead class="thead-light">
-                                <tr>
-                                    <th scope="col">任務名</td>
-                                    <th scope="col">敘述</td>
-                                    <th scope="col">分數</td>
-                                    <th scope="col">到期日</td>
-                                    <th scope="col">剩餘次數</td>
-                                    <th scope="col">完成回報</td>
+                    <table class="table table-hover">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col">任務名</td>
+                                <th scope="col">敘述</td>
+                                <th scope="col">分數</td>
+                                <th scope="col">到期日</td>
+                                <th scope="col">剩餘次數</td>
+                                <th scope="col">完成回報</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @foreach ($tasks->get('todayTasks') as $task)
+                            @php
+                                $confirmed = 2;
+                                foreach($task->users as $user) {
+                                    if($user->pivot->user_id == Auth::user()->id && $user->pivot->task_id == $task->id) {
+                                        $confirmed = $user->pivot->confirmed;
+                                    }
+                                }
+                            @endphp
+                            @if($confirmed == 2)
+                            {{-- <tbody id="category-{{$task->category_id}}"> --}}
+                                <tr class="table-info" data-category="{{$task->category_id}}">
+                                    <td>
+                                        {{ $task->name }}
+                                        <span class="badge badge-danger" style="font-size: 10px">
+                                            今日新增
+                                        </span>
+                                    </td>
+                                    <td>{{ $task->description }}</td>
+                                    <td>{{ $task->score }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($task->expired_at)
+                                        ->tz('Europe/London')
+                                        ->setTimeZone('Asia/Taipei')->locale('zh_TW')
+                                        ->diffForHumans()
+                                    }}</td>
+                                    <td class="text-center">{{ $task->remain_times }}</td>
+                                    <td><button class="btn btn-sm btn-primary" id="report-{{$task->id}}" onclick="getTaskInReport({{ $task->id }}, '{{$task->name}}', 0)">回報</button></td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                            @foreach ($tasks->get('todayTasks') as $task)
-                                @php
-                                    $confirmed = 0;
-                                    $isReport = false;
-                                    foreach($task->users as $user) {
-                                        if($user->pivot->user_id == Auth::user()->id && $user->pivot->task_id == $task->id) {
-                                            $isReport = true;
-                                            $confirmed = $user->pivot->confirmed;
+                            @endif
+                            @endforeach
+                            @foreach ($tasks->get('otherTasks') as $task)
+                            @php
+                                $confirmed = 2;
+                                foreach($task->users as $user) {
+                                    if($user->pivot->user_id == Auth::user()->id && $user->pivot->task_id == $task->id) {
+                                        $confirmed = $user->pivot->confirmed;
+                                    }
+                                }
+                            @endphp
+                            @if ($confirmed == 2)
+                            {{-- <tbody id="category-{{$task->category_id}}"> --}}
+                                <tr data-category="{{$task->category_id}}">
+                                    <td>{{ $task->name }}</td>
+                                    <td>{{ $task->description }}</td>
+                                    <td>{{ $task->score }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($task->expired_at)
+                                        ->tz('Europe/London')
+                                        ->setTimeZone('Asia/Taipei')->locale('zh_TW')
+                                        ->diffForHumans()
+                                    }}</td>
+                                    <td class="text-center">{{ $task->remain_times }}</td>
+                                    <td><button class="btn btn-sm btn-primary" id="report-{{$task->id}}" onclick="getTaskInReport({{ $task->id }}, '{{$task->name}}', 0)">回報</button></td>
+                                </tr>
+                            @endif
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">回報的任務</div>
+                <div class="card-body">
+                    <div class="float-right input-group input-group-sm mb-3" style="width:23ch">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="catInputGroupSelect2">任務種類</label>
+                        </div>
+                        <select class="custom-select" name="" id="catInputGroupSelect2">
+                            @if ($categories->count() > 0)
+                                <option value="-1" selected>全部（預設）</option>
+                                @foreach ($categories as $category)
+                                <option value="{{$category->id}}">{{$category->name}}</option>
+                                @endforeach
+                            @else
+                                <option value="0" selected>尚無任務種類</option>
+                            @endif
+                        </select>
+                    </div>
+                    {{-- <div class="float-right input-group input-group-sm mb-3 mr-3" style="width:23ch">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="dateInputGroupSelect">任務排序</label>
+                        </div>
+                        <select class="custom-select" name="" id="dateInputGroupSelect">
+                        @if ($tasks->count() > 0)
+                            <option value="-1" selected>預設</option>
+                            <option value="">按到期日</option>
+                            <option value="">按任務新增日</option>
+                            <option value="">按任務分數</option>
+                        @else
+                            <option value="0" selected>尚無任務</option>
+                        @endif
+                        </select>
+                    </div> --}}
+                    <table class="table table-hover">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col">任務名</th>
+                                <th scope="col">敘述</th>
+                                <th scope="col">分數</th>
+                                <th scope="col">到期日</th>
+                                <th scope="col">剩餘次數</th>
+                                <th scope="col">回報狀態</th>
+                                <th scope="col">完成回報</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @foreach ($tasks->get('todayTasks') as $task)
+                            @php
+                                $confirmed = 1;
+                                $isPassed = false;
+                                foreach($task->users as $user) {
+                                    if($user->pivot->user_id == Auth::user()->id && $user->pivot->task_id == $task->id) {
+                                        $confirmed = $user->pivot->confirmed;
+                                        if($confirmed == 1 || $confirmed == 0){
+                                            $isPassed = true;
                                         }
                                     }
-                                @endphp
-                                @if($confirmed == 0)
-                                {{-- <tbody id="category-{{$task->category_id}}"> --}}
-                                    <tr class="table-info" data-category="{{$task->category_id}}">
-                                        <td>
-                                            {{ $task->name }}
-                                            <span class="badge badge-danger" style="font-size: 10px">
-                                                今日新增
-                                            </span>
-                                        </td>
-                                        <td>{{ $task->description }}</td>
-                                        <td>{{ $task->score }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($task->expired_at)
-                                            ->tz('Europe/London')
-                                            ->setTimeZone('Asia/Taipei')->locale('zh_TW')
-                                            ->diffForHumans()
-                                        }}</td>
-                                        <td class="text-center">{{ $task->remain_times }}</td>
-                                        @if ($isReport)
-                                        <td><button class="btn btn-sm btn-secondary" disabled>待審核</button></td>
-                                        @else
-                                        <td><button class="btn btn-sm btn-primary" id="report-{{$task->id}}" onclick="getTaskInReport({{ $task->id }}, '{{$task->name}}')">回報</button></td>
-                                        @endif
-                                    </tr>
-                                @endif
-                                @endforeach
-                                @foreach ($tasks->get('otherTasks') as $task)
-                                @php
-                                    $confirmed = 0;
-                                    $isReport = false;
-                                    foreach($task->users as $user) {
-                                        if($user->pivot->user_id == Auth::user()->id && $user->pivot->task_id == $task->id) {
-                                            $isReport = true;
-                                            $confirmed = $user->pivot->confirmed;
+                                }
+                            @endphp
+                            @if($confirmed != 1)
+                            {{-- <tbody id="category-{{$task->category_id}}"> --}}
+                                <tr class="table-info" data-category="{{$task->category_id}}">
+                                    <td>
+                                        {{ $task->name }}
+                                    </td>
+                                    <td>{{ $task->description }}</td>
+                                    <td>{{ $task->score }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($task->expired_at)
+                                        ->tz('Europe/London')
+                                        ->setTimeZone('Asia/Taipei')->locale('zh_TW')
+                                        ->diffForHumans()
+                                    }}</td>
+                                    <td class="text-center">{{ $task->remain_times }}</td>
+                                    @if ($confirmed == 0)
+                                    <td>
+                                        <span class="badge badge-primary">任務審核中</span>
+                                    </td>
+                                    @else
+                                    <td>
+                                        <span class="badge badge-danger">任務遭駁回</span>
+                                    </td>
+                                    @endif
+                                    @if ($isPassed)
+                                    <td><button class="btn btn-sm btn-secondary" id="report-{{$task->id}}" disabled>再回報</button></td>
+                                    @else
+                                    <td><button class="btn btn-sm btn-primary" id="report-{{$task->id}}" onclick="getTaskInReport({{ $task->id }}, '{{$task->name}}', 1)">再回報</button></td>
+                                    @endif
+                                </tr>
+                            @endif
+                            @endforeach
+                            @foreach ($tasks->get('otherTasks') as $task)
+                            @php
+                                $confirmed = 1;
+                                $isPassed = false;
+                                foreach($task->users as $user) {
+                                    if($user->pivot->user_id == Auth::user()->id && $user->pivot->task_id == $task->id) {
+                                        $confirmed = $user->pivot->confirmed;
+                                        if($confirmed == 1 || $confirmed == 0){
+                                            $isPassed = true;
                                         }
                                     }
-                                @endphp
-                                @if ($confirmed == 0)
-                                {{-- <tbody id="category-{{$task->category_id}}"> --}}
-                                    <tr data-category="{{$task->category_id}}">
-                                        <td>{{ $task->name }}</td>
-                                        <td>{{ $task->description }}</td>
-                                        <td>{{ $task->score }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($task->expired_at)
-                                            ->tz('Europe/London')
-                                            ->setTimeZone('Asia/Taipei')->locale('zh_TW')
-                                            ->diffForHumans()
-                                        }}</td>
-                                        <td class="text-center">{{ $task->remain_times }}</td>
-                                        @if ($isReport)
-                                        <td><button class="btn btn-sm btn-secondary" disabled>待審核</button></td>
-                                        @else
-                                        <td><button class="btn btn-sm btn-primary" id="report-{{$task->id}}" onclick="getTaskInReport({{ $task->id }}, '{{$task->name}}')">回報</button></td>
-                                        @endif
-                                    </tr>
-                                @endif
-                                @endforeach
-                            </tbody>
-                        </table>
-                    @else
-                        <hr class="mt-5">
-                        目前沒有任何任務
-                    @endif
+                                }
+                            @endphp
+                            @if ($confirmed != 1)
+                            {{-- <tbody id="category-{{$task->category_id}}"> --}}
+                                <tr data-category="{{$task->category_id}}">
+                                    <td>{{ $task->name }}</td>
+                                    <td>{{ $task->description }}</td>
+                                    <td>{{ $task->score }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($task->expired_at)
+                                        ->tz('Europe/London')
+                                        ->setTimeZone('Asia/Taipei')->locale('zh_TW')
+                                        ->diffForHumans()
+                                    }}</td>
+                                    <td class="text-center">{{ $task->remain_times }}</td>
+                                    @if ($confirmed == 0)
+                                    <td>
+                                        <span class="badge badge-primary">任務審核中</span>
+                                    </td>
+                                    @else
+                                    <td>
+                                        <span class="badge badge-danger">任務遭駁回</span>
+                                    </td>
+                                    @endif
+                                    @if ($isPassed)
+                                    <td><button class="btn btn-sm btn-secondary" id="report-{{$task->id}}" disabled>再回報</button></td>
+                                    @else
+                                    <td><button class="btn btn-sm btn-primary" id="report-{{$task->id}}" onclick="getTaskInReport({{ $task->id }}, '{{$task->name}}', 1)">再回報</button></td>
+                                    @endif
+                                </tr>
+                            @endif
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -160,24 +280,33 @@
 </div>
 @include('inc.reportTask')
 <script>
-    function getTaskInReport(id, name) {
+    function getTaskInReport(id, name, isReport) {
         $('#task-name').empty();
         $('#task-report').empty();
         $('#task-name').append(name);
         $('#task-id').val(id);
+        $('#is-report').val(isReport);
         $('#reportTaskModalCenter').modal('toggle');
     }
-    $(() => {
-        $('#catInputGroupSelect').change(() => {
-            let selected = $("#catInputGroupSelect").find(":selected").val();
-            if(selected > 0) {
-                $('tr').hide();
-                $('thead tr').show();
-                $(`tbody tr[data-category=${$("#catInputGroupSelect").find(":selected").val()}]`).show();
-            }else if(selected < 0) {
-                $('tr').show();
-            }
-        })
+    $('#catInputGroupSelect').change(() => {
+        let selected = $("#catInputGroupSelect").find(":selected").val();
+        if(selected > 0) {
+            $('table:eq(0) tr').hide();
+            $('thead:eq(0) tr').show();
+            $(`tbody:eq(0) tr[data-category=${$("#catInputGroupSelect").find(":selected").val()}]`).show();
+        }else if(selected < 0) {
+            $('table:eq(0) tr').show();
+        }
+    })
+    $('#catInputGroupSelect2').change(() => {
+        let selected = $("#catInputGroupSelect2").find(":selected").val();
+        if(selected > 0) {
+            $('table:eq(1) tr').hide();
+            $('thead:eq(1) tr').show();
+            $(`tbody:eq(1) tr[data-category=${$("#catInputGroupSelect").find(":selected").val()}]`).show();
+        }else if(selected < 0) {
+            $('table:eq(1) tr').show();
+        }
     })
 </script>
 @if ($categories->count() == 0)

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Category;
 use App\Group;
 use App\Http\Controllers\Api\V1\UpdateApiToken;
 use App\Http\Resources\Tasks\Task as TaskResource;
@@ -9,6 +10,7 @@ use App\Http\Controllers\Controller;
 use App\Task;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class TaskController extends Controller
 {
@@ -30,14 +32,27 @@ class TaskController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required',
-            'description' => 'required',
-            'category_id' => 'required',
-            'expired_at' => 'required|date_format:Y-m-d',
-            'score' => 'required',
-            'remain_times' => 'required',
-            'confirmed' => 'required'
+            'name' => 'required|max:20',
+            'description' => 'required|max:100',
+            'category_id' => 'required|integer|min:1',
+            'expired_at' => 'required|date_format:Y-m-d|after:tomorrow',
+            'score' => 'required|integer|min:1',
+            'remain_times' => 'required|integer|min:1',
+            'confirmed' => 'required|integer|between:-1,1'
         ]);
+
+        if(Gate::denies('users.viewAny', auth()->user())) {
+            return response(['message' => 'The user has no active group.'], 422);
+        }
+
+        $category = Category::find($request->input('category_id'));
+        if( $category == NULL) {
+            return response(['message' => 'The category is not found.'], 422);
+        }
+        if( $category->group_id != auth()->user()->active_group) {
+            return response(['message' => 'This category is not in the current group.'], 422);
+        }
+
         $this->task->name = $request->input('name');
         $this->task->description = $request->input('description');
         $this->task->category_id = $request->input('category_id');
@@ -65,15 +80,34 @@ class TaskController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'name' => 'required',
-            'description' => 'required',
-            'category_id' => 'required',
-            'expired_at' => 'required|date_format:Y-m-d',
-            'score' => 'required',
-            'remain_times' => 'required',
+            'name' => 'required|string|max:20',
+            'description' => 'required|string|max:100',
+            'category_id' => 'required|integer|min:1',
+            'expired_at' => 'required|date_format:Y-m-d|after:tomorrow',
+            'score' => 'required|integer|min:1',
+            'remain_times' => 'required|integer|min:1',
             'confirmed' => 'required'
         ]);
+
+        if(Gate::denies('users.viewAny', auth()->user())) {
+            return response(['message' => 'The user has no active group.'], 422);
+        }
+
+        $category = Category::find($request->input('category_id'));
+        if( $category == NULL) {
+            return response(['message' => 'The category is not found.'], 422);
+        }
+        if( $category->group_id != auth()->user()->active_group) {
+            return response(['message' => 'This category is not in the current group.'], 422);
+        }
+
         $task = $this->task->find($id);
+        if($task == NULL) {
+            return response(['message' => 'The task is not found.'], 422);
+        }
+        if(Group::find(auth()->user()->active_group)->tasks()->where('tasks.id', $task->id)->get()->count() == 0) {
+            return response(['message' => 'The task is not found in this group.'], 422);
+        }
 
         $newConfirmed = 1;
         if($request->input('confirmed') == -1) {
@@ -135,21 +169,39 @@ class TaskController extends Controller
     {
         $request->validate([
             'id' => 'required',
-            'report' => 'required'
+            'report' => 'nullable'
         ]);
+
         $task = $this->task->find($request->id);
-        $task->users()->attach(auth()->user()->id, [
-            'confirmed' => 0,
-            'report' => $request->report,
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
-        $this->updateApiToken(auth()->user());
-        foreach($task->users as $user) {
-            if($user->pivot->user_id == auth()->user()->id) {
-                return $user->pivot;
+
+        if($task != NULL) {
+            if($task->users()->where('users.id', auth()->user()->id)->get()->count() == 0){
+                $task->users()->attach(auth()->user()->id, [
+                    'confirmed' => 0,
+                    'report' => $request->report,
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
+                ]);
+                $this->updateApiToken(auth()->user());
+                foreach($task->users as $user) {
+                    if($user->pivot->user_id == auth()->user()->id) {
+                        return $user->pivot;
+                    }
+                }
+            }
+            $task->users()->updateExistingPivot(auth()->user()->id, [
+                'confirmed' => 0,
+                'report' => $request->report,
+                'updated_at' => Carbon::now()
+            ]);
+            $this->updateApiToken(auth()->user());
+            foreach($task->users as $user) {
+                if($user->pivot->user_id == auth()->user()->id) {
+                    return $user->pivot;
+                }
             }
         }
+        return response(['message' => 'The task is not found.'], 422);
     }
 
     public function getConfirmed(Request $request)
@@ -158,7 +210,7 @@ class TaskController extends Controller
             'user_id' => 'required',
             'group_id' => 'required'
         ]);
-        if($request->input('group_id')!== NULL) {
+        if($request->input('group_id')!= NULL) {
             $tasks = Group::find($request->input('group_id'))->tasks
                 ->filter(function($value) use($request) {
                     if($value->users->count() > 0){
@@ -174,7 +226,7 @@ class TaskController extends Controller
                     return $item = $item->where('id', $item->id)->with('users')->with('category')->first();
                 });
         }else {
-            return ['message' => 'This user has no active group.'];
+            return response(['message' => 'The user has no active group.'], 422);
         }
 
         TaskResource::withoutWrapping();
@@ -185,9 +237,21 @@ class TaskController extends Controller
     {
         $request->validate([
             'id' => 'required',
-            'confirmed' => 'required'
+            'confirmed' => 'required|integer|between:-1,1'
         ]);
+
         $task = $this->task->where('id', $request->input('id'))->with('category')->first();
+        if($task == NULL) {
+            return response(['message' => 'The task is not found.'], 422);
+        }
+
+        if(Gate::denies('users.viewAny', auth()->user())) {
+            return response(['message' => 'The user has no active group.'], 422);
+        }
+        if(Gate::denies('users.viewAuthority', auth()->user())){
+            return response(['message' => 'The user is not authorized.'], 422);
+        }
+
         $task->confirmed = $request->input('confirmed');
         $task->save();
         $this->updateApiToken(auth()->user());
@@ -199,10 +263,20 @@ class TaskController extends Controller
         $request->validate([
             'task_id' => 'required',
             'user_id' => 'required',
-            'confirmed' => 'required'
+            'confirmed' => 'required|integer|between:-1,1'
         ]);
+
+        if(Gate::denies('users.viewAny', auth()->user())) {
+            return response(['message' => 'The user has no active group.'], 422);
+        }
+        if(Gate::denies('users.viewAuthority', auth()->user())){
+            return response(['message' => 'The user is not authorized.'], 422);
+        }
+
         $task = $this->task->where('id', $request->input('task_id'))->with('category')->first();
-        $task->remain_times--;
+        if($request->input('confirmed') == 1){
+            $task->remain_times--;
+        }
         $task->save();
         $task->users()->updateExistingPivot($request->input('user_id'), [
             'confirmed' => $request->input('confirmed'),

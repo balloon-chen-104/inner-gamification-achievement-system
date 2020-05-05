@@ -10,6 +10,7 @@
                 @csrf
                 <div class="modal-body">
                     <input type="text" name="task-id" id="task-id" style="display: none">
+                    <input type="text" name="is-report" id="is-report" style="display: none">
                     <div class="form-group">
                         <p>任務內容：<strong id="task-name"></strong></p>
                     </div>
@@ -20,7 +21,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
-                    <button type="submit" class="btn btn-primary">新增</button>
+                    <button type="submit" class="btn btn-primary">回報</button>
                 </div>
             </form>
         </div>
@@ -30,10 +31,10 @@
     $(document).ready(() => {
         $("#report-task-form").submit((event) => {
             event.preventDefault();
-            addCategory();
+            reportTask();
         });
     });
-    function addCategory(){
+    function reportTask(){
         const data = {
             'id': $('#task-id').val(),
             'report': $('#task-report').val()
@@ -55,8 +56,26 @@
                 $('#success-msg').empty();
                 $('#success-msg').append(`任務 ${$('#task-name').text()} 已回報成功`);
                 $('#success-msg').slideToggle();
-                $(`#report-${taskId}`).removeClass( 'btn-primary' ).addClass( 'btn-secondary' ).attr('disabled', true).html('待審核');
                 $('#reportTaskModalCenter').modal('toggle');
+                if($('#is-report').val() == 1){
+                    $(`#report-${taskId}`).removeClass( 'btn-primary' ).addClass( 'btn-secondary' ).attr('disabled', true);
+                    $(`#report-${taskId}`).parent().parent().children('td:eq(5)').empty().append('<span class="badge badge-primary">任務審核中</span>');
+                } else {
+                    $('tbody:eq(1)').prepend(`
+                        <tr data-category="${$(`#report-${taskId}`).parent().parent().data('category')}"  style="background-color:rgba(115, 134, 213,  0.2)">
+                            <td>
+                                ${$(`#report-${taskId}`).parent().parent().children('td:eq(0)').text()}
+                            </td>
+                            <td>${$(`#report-${taskId}`).parent().parent().children('td:eq(1)').text()}</td>
+                            <td>${$(`#report-${taskId}`).parent().parent().children('td:eq(2)').text()}</td>
+                            <td>${$(`#report-${taskId}`).parent().parent().children('td:eq(3)').text()}</td>
+                            <td class="text-center">${$(`#report-${taskId}`).parent().parent().children('td:eq(4)').text()}</td>
+                            <td><span class="badge badge-primary">任務審核中</span></td>
+                            <td><button class="btn btn-sm btn-secondary" disabled>再回報</button></td>
+                        </tr>
+                    `);
+                    $(`#report-${taskId}`).parent().parent().detach();
+                }
                 apiToken();
                 setTimeout(()=>{
                     $('#success-msg').slideToggle();

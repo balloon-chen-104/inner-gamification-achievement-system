@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 
 $factory->define(Group::class, function (Faker $faker) {
     return [
-        'creator_id' => factory(User::class),
+        // 'creator_id' => factory(User::class),
         'group_token' => Str::random(5),
         'name' => Str::random(5),
         'description' => Str::random(10)

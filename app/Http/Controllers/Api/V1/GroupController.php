@@ -95,11 +95,14 @@ class GroupController extends Controller
             'group_token' => 'required|size:5'
         ]);
         $token = $request->input('group_token');
-        $enter_group = $this->group->with('users')->where('group_token', $token)->first();
-        $enter_group->users()->attach(auth()->user()->id, ['authority' => 0]);
+        if(Group::where('group_token', $token)->first() != NULL) {
+            $enter_group = $this->group->with('users')->where('group_token', $token)->first();
+            $enter_group->users()->attach(auth()->user()->id, ['authority' => 0]);
 
-        $this->updateApiToken(auth()->user());
+            $this->updateApiToken(auth()->user());
 
-        return new GroupResource($enter_group);
+            return new GroupResource($enter_group);
+        }
+        return response([ "message" => "This group Token has no match group." ], 422);
     }
 }

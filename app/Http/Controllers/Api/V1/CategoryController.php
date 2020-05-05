@@ -38,48 +38,15 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required',
+            'name' => 'required|max:15',
         ]);
-
-        $this->category->name = $request->input('name');
-        $this->category->group_id = auth()->user()->active_group;
-        $this->category->save();
-        $this->updateApiToken(auth()->user());
-        return new CategoryResource($this->category);
-        // return CategoryResource::collection($this->category->with('group')->get());
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+        if(auth()->user()->active_group != NULL) {
+            $this->category->name = $request->input('name');
+            $this->category->group_id = auth()->user()->active_group;
+            $this->category->save();
+            $this->updateApiToken(auth()->user());
+            return new CategoryResource($this->category);
+        }
+        return response([ "message" => "This user has no active group." ], 422);
     }
 }
