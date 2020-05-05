@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
-use App\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Auth;
@@ -55,9 +54,9 @@ class UserTest extends TestCase
         $this->assertEquals(Auth::user()->id, $user->id);
     }
 
+    // 尚未完成1#
     public function testUserLoginViaAzure()
     {
-        // 尚未完成
         $response = $this->get('/login/azure');
 
         $response->assertStatus(302);
@@ -70,15 +69,5 @@ class UserTest extends TestCase
         
         $this->post('/logout')
              ->assertStatus(302);
-    }
-
-    private function user(): User
-    {
-        return User::create([
-            'name' => 'name',
-            'email' => 'email@test.com',
-            'password' => Hash::make('password'),
-            'api_token' => Str::random(80),
-        ]);
     }
 }

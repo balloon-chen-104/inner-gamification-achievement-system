@@ -7,17 +7,14 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use Auth;
 
-class LeaderboardTest extends TestCase
+class TaskTest extends TestCase
 {
     use RefreshDatabase;
     
     public function testRedirectWhenUserIsNotLogin()
     {
-        $response = $this->get('/leaderboard');
+        $response = $this->get('/');
         $response->assertStatus(302);
-
-        $response = $this->get('/login');
-        $response->assertStatus(200);
     }
 
     public function testRedirectWhenUserWithoutActiveGroup()
@@ -25,7 +22,7 @@ class LeaderboardTest extends TestCase
         $user = $this->user();
         Auth::login($user, true);
         
-        $response = $this->get('/leaderboard');
+        $response = $this->get('/setting');
         $response->assertStatus(302);
 
         $response = $this->get('/');
@@ -33,34 +30,27 @@ class LeaderboardTest extends TestCase
                  ->assertSeeText('建立群組');
     }
 
-    public function testDisplyLeaderboardIndexWithOneRecord()
-    {
-        $user = $this->user();
-        Auth::login($user, true);
-        
-        $group = $this->group($user->id);
-
-        $user->active_group = $group->id;
-        $user->save();
-
-        $response = $this->get('/leaderboard');
-        $response->assertStatus(200)
-                 ->assertSeeText($user->name);
-    }
-
-    // 尚未完成1
-    public function testDisplyLeaderboardIndexWithSortedRecords()
+    public function testDisplyTaskWithNoDatas()
     {
         $response = $this->get('/');
-
         $response->assertStatus(302);
     }
 
-    // 尚未完成2#
-    public function testRedirectToProfileButton()
+    public function testDisplyTaskWithUncompletedTasks()
     {
         $response = $this->get('/');
+        $response->assertStatus(302);
+    }
 
+    public function testDisplyTaskWithCompletedTasks()
+    {
+        $response = $this->get('/');
+        $response->assertStatus(302);
+    }
+
+    public function testDisplyTaskWithTurnDownTasks()
+    {
+        $response = $this->get('/');
         $response->assertStatus(302);
     }
 }
