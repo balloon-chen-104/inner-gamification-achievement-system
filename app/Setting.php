@@ -6,5 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class Setting extends Model
 {
-    protected $fillable = ['cycle', 'started_at', 'group_id'];
+    protected $fillable = ['id', 'cycle', 'started_at', 'group_id'];
 }

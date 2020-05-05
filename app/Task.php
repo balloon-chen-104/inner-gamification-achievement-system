@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Task extends Model
 {
-    protected $fillable = [];
+    protected $fillable = ['id', 'category_id', 'creator_id', 'name', 'description', 'score', 'remain_times', 'confirmed'];
     protected $hidden = [];
 
     public function scopeNotExpired(Builder $query)
