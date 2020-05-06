@@ -28,7 +28,7 @@ abstract class TestCase extends BaseTestCase
             $group->creator_id = $creator_id;
             $group->save();
         }
-        
+
         return $group;
     }
 
@@ -66,7 +66,7 @@ abstract class TestCase extends BaseTestCase
             'category_id' => Category::first()->id,
             'creator_id' => $this->user()->id
         ]);
-        
+
         if($category_id != 0){
             $task->category_id = $category_id;
             $task->save();
@@ -75,10 +75,10 @@ abstract class TestCase extends BaseTestCase
             $task->creator_id = $creator_id;
             $task->save();
         }
-        
+
         $task->expired_at = date_add(date_create($task->created_at), date_interval_create_from_date_string(($days + 2) . ' days'));
         $task->save();
-        
+
         return $task;
     }
 

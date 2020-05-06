@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\UpdateApiToken;
 use App\Http\Resources\Tasks\Task as TaskResource;
 use App\Http\Controllers\Controller;
 use App\Task;
+use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -20,7 +21,7 @@ class TaskController extends Controller
     public function __construct(Task $task)
     {
         $this->task = $task;
-        $this->middleware('auth:api')->except('getConfirmedTasks');
+        $this->middleware('auth:api');
     }
 
     /**
@@ -210,26 +211,37 @@ class TaskController extends Controller
             'user_id' => 'required',
             'group_id' => 'required'
         ]);
-        if($request->input('group_id')!= NULL) {
-            $tasks = Group::find($request->input('group_id'))->tasks
-                ->filter(function($value) use($request) {
-                    if($value->users->count() > 0){
-                        foreach($value->users as $user) {
-                            if($user->id == $request->input('user_id') && $user->pivot->confirmed == 1) {
-                                return true;
-                            }
-                        }
-                    }
-                    return false;
-                })
-                ->transform(function ($item, $key) {
-                    return $item = $item->where('id', $item->id)->with('users')->with('category')->first();
-                });
-        }else {
+
+        if(Gate::denies('users.viewAny', auth()->user())) {
             return response(['message' => 'The user has no active group.'], 422);
         }
+        if(User::find($request->input('user_id')) == NULL) {
+            return response(['message' => 'The user is not found.'], 422);
+        }
+        if(Group::find($request->input('group_id')) == NULL) {
+            return response(['message' => 'The group is not found.'], 422);
+        }
 
-        TaskResource::withoutWrapping();
+        if(User::find($request->input('user_id'))->groups()->where('groups.id', $request->input('group_id'))->get()->count() == 0){
+            return response(['message' => 'The user is not in this group.'], 422);
+        }
+
+        $tasks = Group::find($request->input('group_id'))->tasks
+            ->filter(function($value) use($request) {
+                if($value->users->count() > 0){
+                    foreach($value->users as $user) {
+                        if($user->id == $request->input('user_id') && $user->pivot->confirmed == 1) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            })
+            ->transform(function ($item) {
+                return $item = $item->where('id', $item->id)->with('users')->with('category')->first();
+            });
+
+        // TaskResource::withoutWrapping();
         return TaskResource::collection($tasks);
     }
 
@@ -240,16 +252,16 @@ class TaskController extends Controller
             'confirmed' => 'required|integer|between:-1,1'
         ]);
 
-        $task = $this->task->where('id', $request->input('id'))->with('category')->first();
-        if($task == NULL) {
-            return response(['message' => 'The task is not found.'], 422);
-        }
-
         if(Gate::denies('users.viewAny', auth()->user())) {
             return response(['message' => 'The user has no active group.'], 422);
         }
         if(Gate::denies('users.viewAuthority', auth()->user())){
             return response(['message' => 'The user is not authorized.'], 422);
+        }
+
+        $task = $this->task->where('id', $request->input('id'))->with('category')->first();
+        if($task == NULL) {
+            return response(['message' => 'The task is not found.'], 422);
         }
 
         $task->confirmed = $request->input('confirmed');
@@ -274,6 +286,13 @@ class TaskController extends Controller
         }
 
         $task = $this->task->where('id', $request->input('task_id'))->with('category')->first();
+        if($task == NULL) {
+            return response(['message' => 'The task is not found.'], 422);
+        }
+        if($task->users()->where('users.id', $request->input('user_id'))->get()->count() == 0){
+            return response(['message' => 'The task is not reported by this user.'], 422);
+        }
+
         if($request->input('confirmed') == 1){
             $task->remain_times--;
         }

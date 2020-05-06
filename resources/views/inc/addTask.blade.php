@@ -122,7 +122,16 @@
                     $('.card-body:eq(1)').slideDown();
 
                 }
-
+                $('#add-task-name').val('');
+                $("#add-task-category").children().each(function(){
+                    if($(this).val() == -1){
+                        this.selected = true;
+                    }
+                });
+                $('#add-task-description').val('');
+                $('#add-task-expired-at').val('');
+                $('#add-task-score').val(20);
+                $('#add-task-remain').val(20);
                 apiToken();
                 setTimeout(()=>{
                     $('#success-msg').slideToggle();

@@ -61,11 +61,14 @@
                     $(`#report-${taskId}`).removeClass( 'btn-primary' ).addClass( 'btn-secondary' ).attr('disabled', true);
                     $(`#report-${taskId}`).parent().parent().children('td:eq(5)').empty().append('<span class="badge badge-primary">任務審核中</span>');
                 } else {
+                    let taskName = $(`#report-${taskId}`).parent().parent().children('td:eq(0)');
+                    if(taskName.children('span').text()){
+                        taskName.children('span').detach();
+                    }
+
                     $('tbody:eq(1)').prepend(`
                         <tr data-category="${$(`#report-${taskId}`).parent().parent().data('category')}"  style="background-color:rgba(115, 134, 213,  0.2)">
-                            <td>
-                                ${$(`#report-${taskId}`).parent().parent().children('td:eq(0)').text()}
-                            </td>
+                            <td>${taskName.text()}</td>
                             <td>${$(`#report-${taskId}`).parent().parent().children('td:eq(1)').text()}</td>
                             <td>${$(`#report-${taskId}`).parent().parent().children('td:eq(2)').text()}</td>
                             <td>${$(`#report-${taskId}`).parent().parent().children('td:eq(3)').text()}</td>
