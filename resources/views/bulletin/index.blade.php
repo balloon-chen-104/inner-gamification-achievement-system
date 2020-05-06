@@ -5,7 +5,7 @@
 @foreach ($data['flash_messages'] as $bulletin)
     <div class="alert ml-5 mr-5 alert-my-color">{{ $bulletin->content }}
         @if ($data['autority'])
-            <a href="#" class="close" onclick="event.preventDefault();document.getElementById('flash_message_switch-form-{{ $bulletin->id }}').submit();"></a>
+            <a href="#" class="close" onclick="event.preventDefault();document.getElementById('flash_message_switch-form-{{ $bulletin->id }}').submit();" dusk='close-flash-message-btn'></a>
         @endif
     </div>
 

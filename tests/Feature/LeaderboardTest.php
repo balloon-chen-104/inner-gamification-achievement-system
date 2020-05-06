@@ -72,12 +72,4 @@ class LeaderboardTest extends TestCase
                  ->assertSeeText($user2->name)
                  ->assertSeeTextInOrder([$user2->name, $user1->name], $escaped = true);
     }
-
-    // 尚未完成
-    public function testRedirectToProfileButton()
-    {
-        $response = $this->get('/');
-
-        $response->assertStatus(302);
-    }
 }

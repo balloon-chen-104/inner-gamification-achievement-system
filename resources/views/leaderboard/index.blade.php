@@ -33,7 +33,7 @@
                                     <td>{{ $user['name'] }}</td>
                                     <td>{{ $user['periodScore'] }}</td>
                                     <td>{{ $user['allScore'] }}</td>
-                                    <td><a href="/profile/{{$user['id']}}" class="btn btn-outline-secondary btn-sm">更多</a></td>
+                                    <td><a href="/profile/{{$user['id']}}" class="btn btn-outline-secondary btn-sm" dusk="see-more-{{$user['id']}}">更多</a></td>
                                 </tr>
                             @endforeach
                         </tbody>

@@ -65,14 +65,6 @@ class BulletinTest extends TestCase
                  ->assertSeeText('test content');
     }
 
-    // 尚未完成
-    public function testDisplyBulletinIndexCloseFlashMessage()
-    {
-        $response = $this->get('/');
-
-        $response->assertStatus(302);
-    }
-
     public function testDisplyBulletinIndexWithAnnouncement()
     {
         $user = $this->user();

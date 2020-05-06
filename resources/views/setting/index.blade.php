@@ -61,7 +61,7 @@
                                             <label class="switch">
                                                 <input type="checkbox"
                                                     @if($flash_message->flash_message_switch) checked @endif
-                                                    onchange = "document.getElementById('flash_message_switch-form-{{ $flash_message->id }}').submit();">
+                                                    onchange = "document.getElementById('flash_message_switch-form-{{ $flash_message->id }}').submit();" name="flash-message-switch-btn-{{ $flash_message->id }}">
                                                 <span class="slider round"></span>
                                             </label>
                                             <input type="hidden" name="flash_message_switch" value="1">

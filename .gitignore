@@ -12,3 +12,4 @@ npm-debug.log
 yarn-error.log
 .DS_Store
 database/seeds
+.env.dusk.local

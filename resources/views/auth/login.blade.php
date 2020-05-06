@@ -53,11 +53,11 @@
 
                         <div class="form-group row mb-0">
                             <div class="col-md-8 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
+                                <button type="submit" class="btn btn-primary" dusk='login-btn'>
                                     {{ __('登入') }}
                                 </button>&nbsp
 
-                                <a href="login/azure" class="btn btn-primary">
+                                <a href="login/azure" class="btn btn-primary" dusk='azure-login-btn'>
                                     微軟登入
                                 </a>
 

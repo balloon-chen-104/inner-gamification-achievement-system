@@ -166,14 +166,6 @@ class SettingTest extends TestCase
                  ->assertSeeText('新增快訊');
     }
 
-    // 尚未完成
-    public function testSettingCreateFlashMessageStore()
-    {
-        $response = $this->get('/');
-
-        $response->assertStatus(302);
-    }
-
     public function testSettingEditFlashMessageRedirectWhenUserIsNotAdmin()
     {
         $user = $this->user();
@@ -233,22 +225,6 @@ class SettingTest extends TestCase
         $this->assertDatabaseHas('bulletins', [
             'content' => 'test flash_message updated'
         ]);
-    }
-
-    // 尚未完成
-    public function testSettingIndexCloseFlashMessage()
-    {
-        $response = $this->get('/');
-
-        $response->assertStatus(302);
-    }
-
-    // 尚未完成
-    public function testSettingIndexOpenFlashMessage()
-    {
-        $response = $this->get('/');
-
-        $response->assertStatus(302);
     }
 
     public function testSettingDeleteFlashMessage()

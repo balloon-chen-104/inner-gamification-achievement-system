@@ -245,7 +245,7 @@ class ProfileController extends Controller
         );
         $response = app()->handle($request);
 
-        $tasks = $response->getData();
+        $tasks = $response->getData()->data;
 
 
         // Enter leaderboard or profile without default setting
