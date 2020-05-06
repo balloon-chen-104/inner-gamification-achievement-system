@@ -4,16 +4,11 @@ php:
   - 7.2
   - 7.3
 
-  addons:
-  chrome: stable
-
-  services:
+services:
   - mysql
 
-cache:
-  directories:
-    - node_modules
-    - vendor
+addons:
+  chrome: stable
 
 install:
   - cp .env.travis .env
@@ -31,3 +26,9 @@ before_script:
 script:
   - vendor/bin/phpunit
   - php artisan dusk
+
+cache:
+  directories:
+    - node_modules
+    - "$HOME/.composer/cache/files"
+    - vendor
