@@ -13,8 +13,8 @@ addons:
 install:
   - cp .env.travis .env
   - sudo mysql -e 'create database homestead;'
-  - composer self-update
-  - composer install --prefer-source --no-interaction --dev
+  # - composer self-update
+  - travis_retry composer install --no-interaction --prefer-dist --no-suggest
   - php artisan key:generate
   - php artisan migrate
   - php artisan dusk:chrome-driver
