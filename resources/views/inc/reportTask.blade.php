@@ -65,8 +65,8 @@
                     if(taskName.children('span').text()){
                         taskName.children('span').detach();
                     }
-
-                    $('tbody:eq(1)').prepend(`
+                    checkSecondTableIsEmpty();
+                    $('#task-card-reported > table > tbody').prepend(`
                         <tr data-category="${$(`#report-${taskId}`).parent().parent().data('category')}"  style="background-color:rgba(115, 134, 213,  0.2)">
                             <td>${taskName.text()}</td>
                             <td>${$(`#report-${taskId}`).parent().parent().children('td:eq(1)').text()}</td>
@@ -79,6 +79,7 @@
                     `);
                     $(`#report-${taskId}`).parent().parent().detach();
                 }
+                checkFirstTableIsEmpty()
                 apiToken();
                 setTimeout(()=>{
                     $('#success-msg').slideToggle();
@@ -95,5 +96,34 @@
                 }, 2000);
             },
         });
+    }
+    function checkFirstTableIsEmpty(){
+        if($('#task-card > table > tbody > tr:last').index() + 1 == 0){
+            $('#task-card > table').detach();
+            $('#task-card').append('<hr class="mt-5"><span>目前沒有最新任務</span>');
+        }
+    }
+    function checkSecondTableIsEmpty(){
+        if($('#task-card-reported > table').index() + 1 == 0){
+            $('#task-card-reported > hr').detach();
+            $('#task-card-reported > span').detach();
+            $('#task-card-reported').append(`
+                <table class="table table-hover">
+                    <thead class="thead-light">
+                        <tr>
+                            <th scope="col">任務名</th>
+                            <th scope="col">敘述</th>
+                            <th scope="col">分數</th>
+                            <th scope="col">到期日</th>
+                            <th scope="col">剩餘次數</th>
+                            <th scope="col">回報狀態</th>
+                            <th scope="col">完成回報</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            `);
+        }
     }
 </script>

@@ -36,7 +36,7 @@
             @endif
             <div class="card mb-3">
                 <div class="card-header">任務欄</div>
-                <div class="card-body">
+                <div class="card-body" id="task-card">
                     <div class="float-right input-group input-group-sm mb-3" style="width:23ch">
                         <div class="input-group-prepend">
                             <label class="input-group-text" for="catInputGroupSelect">任務種類</label>
@@ -67,29 +67,34 @@
                         @endif
                         </select>
                     </div> --}}
-                    <table class="table table-hover">
-                        <thead class="thead-light">
-                            <tr>
-                                <th scope="col">任務名</td>
-                                <th scope="col">敘述</td>
-                                <th scope="col">分數</td>
-                                <th scope="col">到期日</td>
-                                <th scope="col">剩餘次數</td>
-                                <th scope="col">完成回報</td>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        @foreach ($tasks->get('todayTasks') as $task)
-                            @php
-                                $confirmed = 2;
-                                foreach($task->users as $user) {
-                                    if($user->pivot->user_id == Auth::user()->id && $user->pivot->task_id == $task->id) {
-                                        $confirmed = $user->pivot->confirmed;
-                                    }
-                                }
-                            @endphp
-                            @if($confirmed == 2)
-                            {{-- <tbody id="category-{{$task->category_id}}"> --}}
+                    @php
+                        $todayNotReportedTasks = $tasks->get('todayTasks')->filter(function($task) {
+                            if($task->users()->where('users.id', Auth::user()->id)->first() == NULL){
+                                return true;
+                            }
+                            return false;
+                        });
+                        $otherNotReportedTasks = $tasks->get('otherTasks')->filter(function($task) {
+                            if($task->users()->where('users.id', Auth::user()->id)->first() == NULL){
+                                return true;
+                            }
+                            return false;
+                        })
+                    @endphp
+                    @if ($todayNotReportedTasks->count() > 0 || $otherNotReportedTasks->count() > 0)
+                        <table class="table table-hover">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th scope="col">任務名</td>
+                                    <th scope="col">敘述</td>
+                                    <th scope="col">分數</td>
+                                    <th scope="col">到期日</td>
+                                    <th scope="col">剩餘次數</td>
+                                    <th scope="col">完成回報</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($todayNotReportedTasks as $task)
                                 <tr class="table-info" data-category="{{$task->category_id}}">
                                     <td>
                                         {{ $task->name }}
@@ -107,19 +112,8 @@
                                     <td class="text-center">{{ $task->remain_times }}</td>
                                     <td><button class="btn btn-sm btn-primary" id="report-{{$task->id}}" onclick="getTaskInReport({{ $task->id }}, '{{$task->name}}', 0)">回報</button></td>
                                 </tr>
-                            @endif
-                            @endforeach
-                            @foreach ($tasks->get('otherTasks') as $task)
-                            @php
-                                $confirmed = 2;
-                                foreach($task->users as $user) {
-                                    if($user->pivot->user_id == Auth::user()->id && $user->pivot->task_id == $task->id) {
-                                        $confirmed = $user->pivot->confirmed;
-                                    }
-                                }
-                            @endphp
-                            @if ($confirmed == 2)
-                            {{-- <tbody id="category-{{$task->category_id}}"> --}}
+                                @endforeach
+                                @foreach ($otherNotReportedTasks as $task)
                                 <tr data-category="{{$task->category_id}}">
                                     <td>{{ $task->name }}</td>
                                     <td>{{ $task->description }}</td>
@@ -132,16 +126,20 @@
                                     <td class="text-center">{{ $task->remain_times }}</td>
                                     <td><button class="btn btn-sm btn-primary" id="report-{{$task->id}}" onclick="getTaskInReport({{ $task->id }}, '{{$task->name}}', 0)">回報</button></td>
                                 </tr>
-                            @endif
-                            @endforeach
-                        </tbody>
-                    </table>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    @else
+                        <hr class="mt-5">
+                        目前沒有最新任務
+                    @endif
+
                 </div>
             </div>
 
             <div class="card">
                 <div class="card-header">回報的任務</div>
-                <div class="card-body">
+                <div class="card-body" id="task-card-reported">
                     <div class="float-right input-group input-group-sm mb-3" style="width:23ch">
                         <div class="input-group-prepend">
                             <label class="input-group-text" for="catInputGroupSelect2">任務種類</label>
@@ -172,34 +170,45 @@
                         @endif
                         </select>
                     </div> --}}
-                    <table class="table table-hover">
-                        <thead class="thead-light">
-                            <tr>
-                                <th scope="col">任務名</th>
-                                <th scope="col">敘述</th>
-                                <th scope="col">分數</th>
-                                <th scope="col">到期日</th>
-                                <th scope="col">剩餘次數</th>
-                                <th scope="col">回報狀態</th>
-                                <th scope="col">完成回報</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        @foreach ($tasks->get('todayTasks') as $task)
-                            @php
-                                $confirmed = 1;
-                                $isPassed = false;
-                                foreach($task->users as $user) {
-                                    if($user->pivot->user_id == Auth::user()->id && $user->pivot->task_id == $task->id) {
-                                        $confirmed = $user->pivot->confirmed;
-                                        if($confirmed == 1 || $confirmed == 0){
-                                            $isPassed = true;
-                                        }
-                                    }
-                                }
-                            @endphp
-                            @if($confirmed != 1)
-                            {{-- <tbody id="category-{{$task->category_id}}"> --}}
+                    @php
+                        $todayReportedTasks = $tasks->get('todayTasks')->filter(function($task) {
+                            $user = $task->users()->where('users.id', Auth::user()->id)->first();
+                            if($user == NULL){
+                                return false;
+                            }else{
+                                if($user->pivot->confirmed == 0 || $user->pivot->confirmed == -1)
+                                return true;
+                            }
+                        });
+                        $otherReportedTasks = $tasks->get('otherTasks')->filter(function($task) {
+                            $user = $task->users()->where('users.id', Auth::user()->id)->first();
+                            if($user == NULL){
+                                return false;
+                            }else{
+                                if($user->pivot->confirmed == 0 || $user->pivot->confirmed == -1)
+                                return true;
+                            }
+                        })
+                    @endphp
+                    @if ($todayReportedTasks->count() > 0 || $otherReportedTasks->count() > 0)
+                        <table class="table table-hover">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th scope="col">任務名</th>
+                                    <th scope="col">敘述</th>
+                                    <th scope="col">分數</th>
+                                    <th scope="col">到期日</th>
+                                    <th scope="col">剩餘次數</th>
+                                    <th scope="col">回報狀態</th>
+                                    <th scope="col">完成回報</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($todayReportedTasks as $task)
+                                @php
+                                    $user = $task->users()->where('users.id', Auth::user()->id)->first();
+                                    $confirmed = $user->pivot->confirmed;
+                                @endphp
                                 <tr class="table-info" data-category="{{$task->category_id}}">
                                     <td>
                                         {{ $task->name }}
@@ -216,36 +225,24 @@
                                     <td>
                                         <span class="badge badge-primary">任務審核中</span>
                                     </td>
+                                    <td><button class="btn btn-sm btn-secondary" id="report-{{$task->id}}" disabled>再回報</button></td>
                                     @else
                                     <td>
                                         <span class="badge badge-danger">任務遭駁回</span>
                                     </td>
-                                    @endif
-                                    @if ($isPassed)
-                                    <td><button class="btn btn-sm btn-secondary" id="report-{{$task->id}}" disabled>再回報</button></td>
-                                    @else
                                     <td><button class="btn btn-sm btn-primary" id="report-{{$task->id}}" onclick="getTaskInReport({{ $task->id }}, '{{$task->name}}', 1)">再回報</button></td>
                                     @endif
                                 </tr>
-                            @endif
-                            @endforeach
-                            @foreach ($tasks->get('otherTasks') as $task)
-                            @php
-                                $confirmed = 1;
-                                $isPassed = false;
-                                foreach($task->users as $user) {
-                                    if($user->pivot->user_id == Auth::user()->id && $user->pivot->task_id == $task->id) {
-                                        $confirmed = $user->pivot->confirmed;
-                                        if($confirmed == 1 || $confirmed == 0){
-                                            $isPassed = true;
-                                        }
-                                    }
-                                }
-                            @endphp
-                            @if ($confirmed != 1)
-                            {{-- <tbody id="category-{{$task->category_id}}"> --}}
+                                @endforeach
+                                @foreach ($otherReportedTasks as $task)
+                                @php
+                                    $user = $task->users()->where('users.id', Auth::user()->id)->first();
+                                    $confirmed = $user->pivot->confirmed;
+                                @endphp
                                 <tr data-category="{{$task->category_id}}">
-                                    <td>{{ $task->name }}</td>
+                                    <td>
+                                        {{ $task->name }}
+                                    </td>
                                     <td>{{ $task->description }}</td>
                                     <td>{{ $task->score }}</td>
                                     <td>{{ \Carbon\Carbon::parse($task->expired_at)
@@ -258,21 +255,21 @@
                                     <td>
                                         <span class="badge badge-primary">任務審核中</span>
                                     </td>
+                                    <td><button class="btn btn-sm btn-secondary" id="report-{{$task->id}}" disabled>再回報</button></td>
                                     @else
                                     <td>
                                         <span class="badge badge-danger">任務遭駁回</span>
                                     </td>
-                                    @endif
-                                    @if ($isPassed)
-                                    <td><button class="btn btn-sm btn-secondary" id="report-{{$task->id}}" disabled>再回報</button></td>
-                                    @else
                                     <td><button class="btn btn-sm btn-primary" id="report-{{$task->id}}" onclick="getTaskInReport({{ $task->id }}, '{{$task->name}}', 1)">再回報</button></td>
                                     @endif
                                 </tr>
-                            @endif
-                            @endforeach
-                        </tbody>
-                    </table>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    @else
+                        <hr class="mt-5">
+                        <span>目前沒有回報任務</span>
+                    @endif
                 </div>
             </div>
         </div>

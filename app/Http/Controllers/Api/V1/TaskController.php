@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Bulletin;
 use App\Category;
 use App\Group;
 use App\Http\Controllers\Api\V1\UpdateApiToken;
@@ -295,6 +296,17 @@ class TaskController extends Controller
 
         if($request->input('confirmed') == 1){
             $task->remain_times--;
+
+            // Flach message Appear
+            $bulletin = new Bulletin;
+            $bulletin->type = 'flash_message';
+            $bulletin->content = User::find($request->input('user_id'))->name. ' 完成任務 '. Task::find($request->input('task_id'))->name;
+            $bulletin->type = 'flash_message';
+            $bulletin->user_id = auth()->user()->id;
+            $bulletin->group_id = auth()->user()->active_group;
+            $bulletin->flash_message_switch = 1;
+            $bulletin->save();
+
         }
         $task->save();
         $task->users()->updateExistingPivot($request->input('user_id'), [

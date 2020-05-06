@@ -87,6 +87,8 @@
                                 </tbody>
                             </table>
                         `)
+                        // solve the problem that the above tbody add an extra td.
+                        $(`#edit-task-${task.id}`).children(':last').detach();
                     } else {
                         $('.card-body:eq(1)').empty().append(`
                             <table class="table table-hover" id="current-task">

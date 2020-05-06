@@ -29,7 +29,7 @@ class BulletinController extends Controller
 
         $group = Group::find(auth()->user()->active_group);
         // $latestTasks = $group->tasks()->orderBy('updated_at', 'desc')->notExpired()->take(5)->get();
-        $latestTasks = $group->tasks()->notExpired()->confirmed()->latest()->get();
+        $latestTasks = $group->tasks()->notExpired()->confirmed()->latest()->remain()->get();
         $todayDateTime = new \DateTime();
         $todayTimeString = $todayDateTime->format('Y-m-d');
 
@@ -67,7 +67,7 @@ class BulletinController extends Controller
         if(!isset(auth()->user()->active_group)){
             return Redirect::to('/');
         }
-        
+
         // Check if user is admin
         $autority = 0;
         $group_users = Group::find(Auth::user()->active_group)->users;
@@ -107,7 +107,7 @@ class BulletinController extends Controller
         if(!$autority){
             return Redirect::to('/bulletin');
         }
-        
+
         $bulletin = Bulletin::find($id);
         return view('bulletin.edit')->with('bulletin', $bulletin);
     }
@@ -166,7 +166,7 @@ class BulletinController extends Controller
     {
         $bulletin = Bulletin::find($id);
         $bulletin->delete();
-        
+
         return Redirect::to('bulletin');
     }
 }
