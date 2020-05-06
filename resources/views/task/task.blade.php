@@ -288,21 +288,19 @@
     $('#catInputGroupSelect').change(() => {
         let selected = $("#catInputGroupSelect").find(":selected").val();
         if(selected > 0) {
-            $('table:eq(0) tr').hide();
-            $('thead:eq(0) tr').show();
-            $(`tbody:eq(0) tr[data-category=${$("#catInputGroupSelect").find(":selected").val()}]`).show();
+            $('#task-card > table > tbody > tr').hide();
+            $(`#task-card > table > tbody tr[data-category=${selected}]`).show();
         }else if(selected < 0) {
-            $('table:eq(0) tr').show();
+            $('#task-card > table > tbody > tr').show();
         }
     })
     $('#catInputGroupSelect2').change(() => {
         let selected = $("#catInputGroupSelect2").find(":selected").val();
         if(selected > 0) {
-            $('table:eq(1) tr').hide();
-            $('thead:eq(1) tr').show();
-            $(`tbody:eq(1) tr[data-category=${$("#catInputGroupSelect").find(":selected").val()}]`).show();
+            $('#task-card-reported > table > tbody > tr').hide();
+            $(`#task-card-reported > table > tbody tr[data-category=${selected}]`).show();
         }else if(selected < 0) {
-            $('table:eq(1) tr').show();
+            $('#task-card-reported > table > tbody > tr').show();
         }
     })
 </script>
