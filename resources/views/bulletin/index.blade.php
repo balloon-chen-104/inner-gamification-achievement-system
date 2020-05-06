@@ -1,20 +1,40 @@
 @extends('layouts.app')
 
 @section('content')
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+        @foreach ($data['flash_messages'] as $bulletin)
+            <div class="alert alert-my-color">{{ $bulletin->content }}
+                @if ($data['autority'])
+                    <a href="#" class="close" onclick="event.preventDefault();document.getElementById('flash_message_switch-form-{{ $bulletin->id }}').submit();" dusk='close-flash-message-btn'></a>
+                @endif
+            </div>
 
-@foreach ($data['flash_messages'] as $bulletin)
-    <div class="alert ml-5 mr-5 alert-my-color">{{ $bulletin->content }}
-        @if ($data['autority'])
-            <a href="#" class="close" onclick="event.preventDefault();document.getElementById('flash_message_switch-form-{{ $bulletin->id }}').submit();" dusk='close-flash-message-btn'></a>
-        @endif
+            <form id="flash_message_switch-form-{{ $bulletin->id }}" action="/setting/{{$bulletin->id}}/updateFlashMessage" method="post">
+                <input type="hidden" name="flash_message_switch" value="bulletin">
+                @method('PUT')
+                @csrf
+            </form>
+        @endforeach
+        </div>
     </div>
+</div>
 
-    <form id="flash_message_switch-form-{{ $bulletin->id }}" action="/setting/{{$bulletin->id}}/updateFlashMessage" method="post">
-        <input type="hidden" name="flash_message_switch" value="bulletin">
-        @method('PUT')
-        @csrf
-    </form>
-@endforeach
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card">
+                <div class="card-header">群組：{{\App\Group::find(Auth::user()->active_group)->name}}</div>
+                <div class="card-body">
+                    {{\App\Group::find(Auth::user()->active_group)->description}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<br>
 
 <div class="container">
     <div class="row justify-content-center">
@@ -22,7 +42,7 @@
             <div class="card">
                 <div class="card-header">公告</div>
                 <div class="card-body">
-                    
+
                     @if (count($data['announcements']) == 0)
                         <p>尚無公告</p>
                     @else
@@ -40,7 +60,7 @@
                             </div>
                         @endforeach
                     @endif
-                    
+
                     <br>
                     @if ($data['autority'])
                         <div class="d-flex justify-content-center">
@@ -65,8 +85,16 @@
                 <div class="card-header">最新任務</div>
                 <div class="card-body">
 
-                    @if (count($data['latestTasks']) > 0)
-                        <table class="table">
+                    @php
+                        $tasks = $data['latestTasks']->filter(function($task) {
+                            if($task->users()->where('users.id', Auth::user()->id)->first() == NULL){
+                                return true;
+                            }
+                            return false;
+                        })->take(5);
+                    @endphp
+                    @if ($tasks->count() > 0)
+                        <table class="table table-hover">
                             <thead>
                                 <tr>
                                     <th scope="col">任務名</th>
@@ -78,50 +106,27 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @php
-                                    // 顯示的最大筆數
-                                    $count = 5;
-                                @endphp
-                                @foreach ($data['latestTasks'] as $latestTask)
-                                    @php
-                                        $confirmed = 0;
-                                        $isReport = false;
-                                        foreach($latestTask->users as $user) {
-                                            if($user->pivot->user_id == Auth::user()->id && $user->pivot->task_id == $latestTask->id) {
-                                                $isReport = true;
-                                                $confirmed = $user->pivot->confirmed;
-                                            }
-                                        }
-                                    @endphp
-                                    @if($confirmed == 0 && $count > 0)
-                                        @php
-                                            $count--;
-                                        @endphp
-                                        <tr>
-                                            <td>
-                                                {{ $latestTask->name }}
-                                                @if ($latestTask->updated_at->format('Y-m-d') == $data['todayTimeString'])
-                                                    <span class="badge badge-danger" style="font-size: 10px">
-                                                        今日新增
-                                                    </span>
-                                                @endif
-                                            </td>
-                                            <td>{{ $latestTask->description }}</td>
-                                            <td>{{ $latestTask->score }}</td>
-                                            <td>{{
-                                                \Carbon\Carbon::parse($latestTask->expired_at)
-                                                    ->tz('Europe/London')
-                                                    ->setTimeZone('Asia/Taipei')->locale('zh_TW')
-                                                    ->diffForHumans()
-                                            }}</td>
-                                            <td class="text-center">{{ $latestTask->remain_times }}</td>
-                                            @if ($isReport)
-                                                <td><button class="btn btn-sm btn-secondary" disabled>待審核</button></td>
-                                            @else
-                                                <td><button class="btn btn-sm btn-primary" id="report-{{$latestTask->id}}" onclick="getTask({{ $latestTask->id }}, '{{$latestTask->name}}')">回報</button></td>
-                                            @endif
-                                        </tr>
-                                    @endif
+                                @foreach ($tasks as $latestTask)
+                                <tr>
+                                    <td>
+                                        {{ $latestTask->name }}
+                                        @if ($latestTask->updated_at->format('Y-m-d') == $data['todayTimeString'])
+                                            <span class="badge badge-danger" style="font-size: 10px">
+                                                今日新增
+                                            </span>
+                                        @endif
+                                    </td>
+                                    <td>{{ $latestTask->description }}</td>
+                                    <td>{{ $latestTask->score }}</td>
+                                    <td>{{
+                                        \Carbon\Carbon::parse($latestTask->expired_at)
+                                            ->tz('Europe/London')
+                                            ->setTimeZone('Asia/Taipei')->locale('zh_TW')
+                                            ->diffForHumans()
+                                    }}</td>
+                                    <td class="text-center">{{ $latestTask->remain_times }}</td>
+                                    <td><button class="btn btn-sm btn-primary" id="report-{{$latestTask->id}}" onclick="getTask({{ $latestTask->id }}, '{{$latestTask->name}}')">回報</button></td>
+                                </tr>
                                 @endforeach
                             </tbody>
                         </table>
