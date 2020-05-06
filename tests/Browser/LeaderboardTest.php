@@ -10,6 +10,8 @@ class LeaderboardTest extends DuskTestCase
 {
     public function testRedirectToProfileButton()
     {
+        $this->artisan('migrate:fresh');
+        
         $user = $this->user();
         $group = $this->group($user->id);
         $group->users()->attach($user->id, ['authority' => 1]);
@@ -27,6 +29,6 @@ class LeaderboardTest extends DuskTestCase
                     ->assertPathIs("/profile/$user->id");
         });
         
-        $this->refreshDatabase();
+        $this->artisan('migrate:fresh');
     }
 }

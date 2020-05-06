@@ -17,4 +17,7 @@ RUN chmod 0444 /etc/mysql/conf.d/my.cnf
 
 CMD ["mysqld"]
 
+COPY docker-entrypoint-initdb.d/database-loader.sh /database-loader.sh
+RUN nohup /database-loader.sh > /dev/null 2>&1 &
+
 EXPOSE 3306

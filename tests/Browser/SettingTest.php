@@ -10,6 +10,8 @@ class SettingTest extends DuskTestCase
 {
     public function testSettingCreateFlashMessageStore()
     {
+        $this->artisan('migrate:fresh');
+        
         $user = $this->user();
         $group = $this->group($user->id);
         $group->users()->attach($user->id, ['authority' => 1]);
@@ -31,7 +33,7 @@ class SettingTest extends DuskTestCase
                     ->assertSee('test content');
         });
         
-        $this->refreshDatabase();
+        $this->artisan('migrate:fresh');
     }
 
     // // 尚未完成

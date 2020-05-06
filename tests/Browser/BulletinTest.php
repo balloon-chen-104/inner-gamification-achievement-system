@@ -10,6 +10,8 @@ class BulletinTest extends DuskTestCase
 {
     public function testDisplyBulletinIndexCloseFlashMessage()
     {
+        $this->artisan('migrate:fresh');
+        
         $user = $this->user();
         $group = $this->group($user->id);
         $group->users()->attach($user->id, ['authority' => 1]);
@@ -27,6 +29,6 @@ class BulletinTest extends DuskTestCase
                     ->assertDontSee($bulletin->content);
         });
 
-        $this->refreshDatabase();
+        $this->artisan('migrate:fresh');
     }
 }
