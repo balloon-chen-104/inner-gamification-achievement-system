@@ -11,5 +11,10 @@ Homestead.yaml
 npm-debug.log
 yarn-error.log
 .DS_Store
-database/seeds
+database/seeds/BulletinSeeder.php
+database/seeds/CategorySeeder.php
+database/seeds/GroupSeeder.php
+database/seeds/SettingSeeder.php
+database/seeds/TaskSeeder.php
+database/seeds/UserSeeder.php
 .env.dusk.local
