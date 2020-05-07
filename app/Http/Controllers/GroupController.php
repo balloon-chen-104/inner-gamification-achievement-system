@@ -51,7 +51,7 @@ class GroupController extends Controller
         $group = $this->group->where('group_token', $request->input('group-id'))->first();
         $user = auth()->user();
         // dd($user);
-        $group->users()->attach($user->id, ['authority' => 1]);
+        $group->users()->attach($user->id, ['authority' => 0]);
 
         $user->active_group = $group->id;
         $user->save();

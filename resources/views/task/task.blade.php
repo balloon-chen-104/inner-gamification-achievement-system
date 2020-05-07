@@ -282,6 +282,7 @@
         $('#task-report').empty();
         $('#task-name').append(name);
         $('#task-id').val(id);
+        $('#task-report').val('');
         $('#is-report').val(isReport);
         $('#reportTaskModalCenter').modal('toggle');
     }
