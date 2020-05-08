@@ -235,7 +235,7 @@ class ProfileController extends Controller
         $currentScoreInThisRank = 0;
 
 
-        $request = Request::create('api/v1/task/confirmed', 'POST', [
+        $request = Request::create(\env('APP_URL') . '/api/v1/task/confirmed', 'POST', [
             'user_id' => $id,
             'group_id' => Auth::user()->active_group
         ]);
