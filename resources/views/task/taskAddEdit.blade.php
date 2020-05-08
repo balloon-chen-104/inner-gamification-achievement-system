@@ -149,8 +149,8 @@
                                 </tr>
                             </thead>
                             @php
-                                $todayTasks = $group->tasks()->today()->notExpired()->confirmed()->latest()->get();
-                                $otherTasks = $group->tasks()->confirmed()->notExpired()->get()->diff($todayTasks);
+                                $todayTasks = $group->tasks()->today()->notExpired()->confirmed()->remain()->latest()->get();
+                                $otherTasks = $group->tasks()->confirmed()->notExpired()->remain()->get()->diff($todayTasks);
                             @endphp
                             <tbody>
                                 @foreach ($todayTasks as $task)

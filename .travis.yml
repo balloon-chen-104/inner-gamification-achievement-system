@@ -3,18 +3,29 @@ language: php
 php:
   - 7.2
   - 7.3
+
+branch:
+  only:
+    - master
+
 services:
   - mysql
-cache:
-  directories:
-    - node_modules
-    - vendor
-before_script:
+
+install:
   - cp .env.travis .env
   - sudo mysql -e 'create database homestead;'
   - composer self-update
-  - composer install --prefer-source --no-interaction --dev
+  - travis_retry composer install --no-interaction --prefer-dist --no-suggest
+
+before_script:
   - php artisan key:generate
   - php artisan migrate
+
 script:
   - vendor/bin/phpunit
+
+cache:
+  directories:
+    - node_modules
+    - "$HOME/.composer/cache/files"
+    - vendor
