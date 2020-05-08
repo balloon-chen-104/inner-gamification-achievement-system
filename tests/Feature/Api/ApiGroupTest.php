@@ -116,6 +116,6 @@ class ApiGroupTest extends TestCase
             'group_token' => '12345'
         ]);
         $response->assertStatus(422)
-            ->assertExactJson([ "message" => "This group Token has no match group." ]);
+            ->assertExactJson([ "message" => "這個 group ID 找不到符合的群組" ]);
     }
 }

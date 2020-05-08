@@ -12,6 +12,7 @@
                     <div class="form-group">
                         <p>輸入群組 ID</p>
                         <input type="text" name="group-id" id="group-id" class="form-control" required>
+                        <span id="enter-group-error-msg"></span>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -54,18 +55,18 @@ function enterGroup(){
                         document.getElementById('active-group-form-${group.id}').submit();">
                         ${group.name}
                     </a>
-                    <form id="active-group-form-${group.id}" action="users/{{Auth::user()->id}}" method="POST" style="display: none;">
+                    <form id="active-group-form-${group.id}" action="/users/{{Auth::user()->id}}" method="POST" style="display: none;">
                         <input type="text" name="active_group" value="${group.id}">
                         @method('PUT')
                         @csrf
                     </form>
                 </li>`);
             $('#enterGroupModalCenter').modal('toggle');
-            apiToken()
+            apiToken();
         },
         error: (e) => {
-            console.log("ERROR: ", e);
-            $('#enterGroupModalCenter').modal('toggle');
+            console.log("ERROR: ", e.responseJSON.message);
+            $('#enter-group-error-msg').css('color','red').show().html(e.responseJSON.message);
         },
     });
 }

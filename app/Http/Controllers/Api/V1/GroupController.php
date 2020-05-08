@@ -43,16 +43,19 @@ class GroupController extends Controller
             'name' => 'required|max:10',
             'description' => 'required|max:100'
         ]);
+        $groupInDB = Group::where('name', $request->input('name'))->first();
+        if($groupInDB == NULL){
+            $this->group->name = $request->input('name');
+            $this->group->creator_id = auth()->user()->id;
+            $this->group->description = $request->input('description');
+            $this->group->group_token = Str::random(5);
+            $this->group->save();
+            $this->group->users()->attach(auth()->user()->id, ['authority' => 1]);
+            $this->updateApiToken($this->group->creator);
 
-        $this->group->name = $request->input('name');
-        $this->group->creator_id = auth()->user()->id;
-        $this->group->description = $request->input('description');
-        $this->group->group_token = Str::random(5);
-        $this->group->save();
-        $this->group->users()->attach(auth()->user()->id, ['authority' => 1]);
-        $this->updateApiToken($this->group->creator);
-
-        return new GroupResource($this->group);
+            return new GroupResource($this->group);
+        }
+        return response(['message' => '群組：'. $request->input('name'). '已存在'], 422);
     }
 
     /**
@@ -66,29 +69,6 @@ class GroupController extends Controller
         return new GroupResource(Group::where('id', $id)->with('categories')->first());
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
-
     public function enter(Request $request)
     {
         $request->validate([
@@ -97,12 +77,17 @@ class GroupController extends Controller
         $token = $request->input('group_token');
         if(Group::where('group_token', $token)->first() != NULL) {
             $enter_group = $this->group->with('users')->where('group_token', $token)->first();
-            $enter_group->users()->attach(auth()->user()->id, ['authority' => 0]);
 
-            $this->updateApiToken(auth()->user());
+            if($enter_group->users()->where('users.id', auth()->user()->id)->first() == NULL) {
+                $enter_group->users()->attach(auth()->user()->id, ['authority' => 0]);
+                $this->updateApiToken(auth()->user());
 
-            return new GroupResource($enter_group);
+                return new GroupResource($enter_group);
+            }
+            return response([ "message" => "你已在此群組" ], 422);
+
+
         }
-        return response([ "message" => "This group Token has no match group." ], 422);
+        return response([ "message" => "這個 group ID 找不到符合的群組" ], 422);
     }
 }

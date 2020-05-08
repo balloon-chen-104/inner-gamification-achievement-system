@@ -6,10 +6,25 @@
     <div class="row justify-content-center">
         <div class="col-md-10">
             <div class="card">
+                <div class="card-header">群組ID</div>
+                <div class="card-body">
+                    {{\App\Group::where('id', Auth::user()->active_group)->first()->group_token}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<br>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card">
                 <div class="card-header">佈告欄週期設定</div>
 
                 <div class="card-body">
- 
+
                     <form action="/setting/updateCycle" method="post" class="form-inline">
                         <p class="text-dark">
                             <span>週期：</span>

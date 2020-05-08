@@ -87,8 +87,16 @@
                     @guest
                     @else
                         <li>
-                            <a href="#" class="download" onclick="$('#addGroupModalCenter').modal('toggle')">建立群組</a>
-                            <a href="#" class="download" onclick="$('#enterGroupModalCenter').modal('toggle')">加入群組</a>
+                            <a href="#" class="download" onclick="
+                                $('#addGroupModalCenter').modal('toggle');
+                                $('#add-group-error-msg').text('');
+                                $('#group-name').val('');
+                                $('#group-description').val('');">建立群組</a>
+                            <a href="#" class="download" onclick="
+                                $('#enterGroupModalCenter').modal('toggle');
+                                $('#enter-group-error-msg').text('');
+                                $('#group-id').val('');
+                                ">加入群組</a>
                         </li>
                         <li>
                             <a class="article" href="{{ route('logout') }}"

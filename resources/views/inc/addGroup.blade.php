@@ -12,6 +12,7 @@
                     <div class="form-group">
                         <label for="group-name">群組名稱</label>
                         <input type="text" name="name" id="group-name" class="form-control" required>
+                        <span id="add-group-error-msg"></span>
                     </div>
                     <div class="form-group">
                         <label for="group-description">群組描述</label>
@@ -59,7 +60,7 @@ function addGroup(){
                         document.getElementById('active-group-form-${group.id}').submit();">
                         ${group.name}
                     </a>
-                    <form id="active-group-form-${group.id}" action="users/{{Auth::user()->id}}" method="POST" style="display: none;">
+                    <form id="active-group-form-${group.id}" action="/users/{{Auth::user()->id}}" method="POST" style="display: none;">
                         <input type="text" name="active_group" value="${group.id}">
                         @method('PUT')
                         @csrf
@@ -69,8 +70,8 @@ function addGroup(){
             apiToken();
         },
         error: (e) => {
-            console.log("ERROR: ", e);
-            $('#addGroupModalCenter').modal('toggle');
+            console.log("ERROR: ", e.responseJSON.message);
+            $('#add-group-error-msg').css('color', 'red').html(e.responseJSON.message).show();
         },
     });
 }

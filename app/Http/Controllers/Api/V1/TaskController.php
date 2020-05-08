@@ -300,7 +300,7 @@ class TaskController extends Controller
             // Flach message Appear
             $bulletin = new Bulletin;
             $bulletin->type = 'flash_message';
-            $bulletin->content = User::find($request->input('user_id'))->name. ' 完成任務 '. Task::find($request->input('task_id'))->name;
+            $bulletin->content = User::find($request->input('user_id'))->name. ' 完成任務 '. $task->name. ', 獲得'. $task->score. '分';
             $bulletin->type = 'flash_message';
             $bulletin->user_id = auth()->user()->id;
             $bulletin->group_id = auth()->user()->active_group;
