@@ -11,21 +11,23 @@ use Redirect;
 
 class ProfileController extends Controller
 {
-    // define scores of rank
-    private $medals = [
-        50 => '銅牌III',
-        100 => '銅牌II',
-        150 => '銅牌I',
-        250 => '銀牌III',
-        350 => '銀牌II',
-        450 => '銀牌I',
-        600 => '金牌III',
-        750 => '金牌II'
-    ];
+    private $medals;
 
     public function __construct()
     {
         $this->middleware('auth');
+        
+        $medals = [
+            \env('MEDAL_BRONZE_III') => '銅牌III',
+            \env('MEDAL_BRONZE_II') => '銅牌II',
+            \env('MEDAL_BRONZE_I') => '銅牌I',
+            \env('MEDAL_SILVER_III') => '銀牌III',
+            \env('MEDAL_SILVER_II') => '銀牌II',
+            \env('MEDAL_SILVER_I') => '銀牌I',
+            \env('MEDAL_GOLD_III') => '金牌III',
+            \env('MEDAL_GOLD_II') => '金牌II'
+        ];
+        $this->medals = $medals;
     }
 
     public function index()
