@@ -73,7 +73,7 @@ class SettingTest extends TestCase
 
         $response = $this->get('/setting/editCycle');
         $response->assertStatus(200)
-                 ->assertDontSeeText('群組ID');
+                 ->assertSeeText('返回');
     }
 
     public function testSettingEditCycleUpdate()
