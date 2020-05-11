@@ -29,3 +29,22 @@ cache:
     - node_modules
     - "$HOME/.composer/cache/files"
     - vendor
+
+before_deploy:
+  - rm .env
+  - cp .env.example .env
+  - php artisan key:generate
+
+deploy:
+  provider: elasticbeanstalk
+  access_key_id:
+    secure: "ZxMpNjxWTqwdfmULZb2eXuRUzT/Qr0psEppEVpOMxk7Q3wYRardpYT/qzDB1MmehFRAgd2Kr5A6rwv5ZDciTUR6tpRnrzvIiPgurW22PglhGWFwYQNWRCfJ5OF3KpV7r3lncrmKwx9Wyu9GhBO+h5TS71PAbo6pAeWgFeWTRrHa/tmbm9jeuL54A7wRVEbW8o+DgfQPU+vbkwNya8Q0FGP5pdNRKFAUwSt67QmJWfwIlZjljqkH8N5wcbTzBEG1GPOo2cawb71YQRtsUekbJnh7CQuRie2H+wezCWgS4SC3zfuPst9/IGW/h3AVwcos6FLwfFfvCDQatVgTxa6kT2tqrTDIv3kuN6d71UcbE22PCl1aNRW19hUoKQGJDdWDVhWmupjnRzCA66hy8EqhkQ6ErGuK1fSGIkQ+BLrfEu2hyOLNkYRHFHQvcQq+NSFK5aRFtVLF6GYGOpgUoy+DKvqF7VnXDEY/DzYR1JCArS1Lek14Jr613a/aNBj5NQIPDY0LPCYGNE2qRDyEM9AjUkIs2CUBtZvt90cLM3MFmMCYQRHZ+7Q7rherPo8yGaWZFfZnbdU8P9kHx/1Sc2xLZBj2iakdVwh3nuML76Adke5dqaF9GOBI4opeFQfDtQcmV9aveHOWk67fNtnisQMB1i07gAO2Vibm+TeIZk3flzrk="
+  secret_access_key:
+    secure: "UsOaksDFJrLHkbuqcKzu/Mvj70Ho4cNR/ESTQ9VAYO/sHl09b7TplPTPd2SH3cA7YOATzatKo9hm/l06Sd//F4PTPCqyvaWshVsyQIB3FtsyZ5vYJvrXWex83oBRgBiU+J6HBdTfUfcoPGhTVeRhcNFaGsmJ83OdrB8ZCzsGDnvDXeRf3U90uE3XgBETj0LpPikwgqyCKnvSAv7b4CX7UYnhkZDz8EBRg0151ZAZP4D13EVqfCNVcHYEEfwIq72xFsWO1poWJf401fdGpVNcv3NY5Z+kCOWExBKFlBjGpqy2lNhM5HBJcqMtcz66jcYUQ5y9DyoZjQI34vvnSU1tFH7pDj3rmhmgOjA0CUeTlWQ320HQUOhOstoq+a+V3NolVJy++igXC+uwC4Lll4/mFrRmQQfJsZes/Ne7A4fmb1ALTDFGI65zRZz8+kbu3mt5rcqGg9m49XRqOZwN4StcIHy5QRaetcmdk6SP3DATgzpS3GnmA/M9vfFOm4WnhTTGpuAONRONzvWA3RbBno0mSWXdk6oL797bqQ8/oaTvKMqdDHqGx820GfJAJKkEUqksVTHX8WGRhA1y7T2SO8zf5RKf6MY5Edu2QEi/ETL2OaAsSq7OggXwmBSoufNAQRn/qqd5p+jcGu9szCLQJ0fMMqWmipWJACKX/ECeiZbHN6Q="
+  region: "us-west-2"
+  app: "GamificationApplication"
+  env: "Gamificationapplication-env"
+  bucket_name: "elasticbeanstalk-us-west-2-514451421785"
+
+after_deploy:
+  - echo "done deploying"
