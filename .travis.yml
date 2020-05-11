@@ -30,7 +30,7 @@ cache:
     - vendor
 
 before_deploy:
-  - sed -in-place '23s/$/$AZURE_KEY/; 24x/$/$AZURE_SECRET/' .env.example
+  - sed -in-place '23s/$/$AZURE_KEY/; 24s/$/$AZURE_SECRET/' .env.example
   - rm .env.examplen-place
 deploy:
   provider: elasticbeanstalk
