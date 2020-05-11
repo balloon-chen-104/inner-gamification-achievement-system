@@ -45,6 +45,7 @@ deploy:
   app: "GamificationApplication"
   env: "Gamificationapplication-env"
   bucket_name: "elasticbeanstalk-us-west-2-514451421785"
+  skip_cleanup: true
 
 after_deploy:
   - echo "done deploying"
