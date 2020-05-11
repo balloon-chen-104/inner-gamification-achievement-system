@@ -1,7 +1,6 @@
 dist: bionic
 language: php
 php:
-  - 7.2
   - 7.3
 
 branch:
@@ -30,16 +29,19 @@ cache:
     - "$HOME/.composer/cache/files"
     - vendor
 
+before_deploy:
+  - sed -in-place sed '23s/$/$AZURE_KEY/; 24x/$/$AZURE_SECRET/' .env.example
+  - rm .env.examplen-place
 deploy:
   provider: elasticbeanstalk
   edge: true
+  skip_cleanup: true
   access_key_id: $AWS_ACCESS_KEY
   secret_access_key: $AWS_SECRET_KEY
   region: "us-west-2"
   app: "gamification-achievement-system"
   env: "GamificationAchievementSystem-env"
   bucket_name: "elasticbeanstalk-us-west-2-514451421785"
-  skip_cleanup: true
 
 after_deploy:
   - echo "done deploying"
