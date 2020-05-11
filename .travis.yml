@@ -30,19 +30,14 @@ cache:
     - "$HOME/.composer/cache/files"
     - vendor
 
-before_deploy:
-  - rm .env
-  - cp .env.example .env
-  - php artisan key:generate
-
 deploy:
   provider: elasticbeanstalk
   edge: true
   access_key_id: $AWS_ACCESS_KEY
   secret_access_key: $AWS_SECRET_KEY
   region: "us-west-2"
-  app: "GamificationApplication"
-  env: "Gamificationapplication-env"
+  app: "gamification-achievement-system"
+  env: "GamificationAchievementSystem-env"
   bucket_name: "elasticbeanstalk-us-west-2-514451421785"
   skip_cleanup: true
 
