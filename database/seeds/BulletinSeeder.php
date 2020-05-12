@@ -14,14 +14,14 @@ class BulletinSeeder extends Seeder
     {
         $bulletin = Bulletin::create([
             'type' => 'announcement',
-            'content' => '公告 A',
+            'content' => '這一期最高分的夥伴可以優先挑選下次的零食唷！',
             'user_id' => 1,
             'group_id' => 1
         ]);
 
         $bulletin = Bulletin::create([
             'type' => 'announcement',
-            'content' => '公告 B',
+            'content' => '這一期前兩高分的夥伴可以獲得免費手搖飲料一杯～',
             'user_id' => 1,
             'group_id' => 1
         ]);
@@ -29,7 +29,7 @@ class BulletinSeeder extends Seeder
 
         $bulletin = Bulletin::create([
             'type' => 'flash_message',
-            'content' => 'content A',
+            'content' => '陳柏綸 完成任務 假日去哪兒？當然是研討會呀, 獲得20分',
             'flash_message_switch' => 1,
             'user_id' => 1,
             'group_id' => 1
@@ -37,7 +37,7 @@ class BulletinSeeder extends Seeder
 
         $bulletin = Bulletin::create([
             'type' => 'flash_message',
-            'content' => 'content B',
+            'content' => '張宇航 完成任務 假日去哪兒？當然是研討會呀, 獲得20分',
             'flash_message_switch' => 1,
             'user_id' => 1,
             'group_id' => 1
@@ -45,7 +45,7 @@ class BulletinSeeder extends Seeder
 
         $bulletin = Bulletin::create([
             'type' => 'flash_message',
-            'content' => 'content C',
+            'content' => '黃仕孟 完成任務 假日去哪兒？當然是研討會呀, 獲得20分',
             'flash_message_switch' => 1,
             'user_id' => 1,
             'group_id' => 1
@@ -53,7 +53,7 @@ class BulletinSeeder extends Seeder
 
         $bulletin = Bulletin::create([
             'type' => 'flash_message',
-            'content' => 'content D',
+            'content' => '劉康港 完成任務 假日去哪兒？當然是研討會呀, 獲得20分',
             'flash_message_switch' => 0,
             'user_id' => 1,
             'group_id' => 1
@@ -61,7 +61,7 @@ class BulletinSeeder extends Seeder
 
         $bulletin = Bulletin::create([
             'type' => 'flash_message',
-            'content' => 'content E',
+            'content' => '曾理碩 網路新住民, 獲得30分',
             'flash_message_switch' => 0,
             'user_id' => 1,
             'group_id' => 1
@@ -69,7 +69,7 @@ class BulletinSeeder extends Seeder
 
         $bulletin = Bulletin::create([
             'type' => 'flash_message',
-            'content' => 'content F',
+            'content' => '黃仕孟 網路新住民, 獲得30分',
             'flash_message_switch' => 1,
             'user_id' => 1,
             'group_id' => 1
@@ -77,7 +77,7 @@ class BulletinSeeder extends Seeder
 
         $bulletin = Bulletin::create([
             'type' => 'flash_message',
-            'content' => 'content G',
+            'content' => '楊詔欽 網路新住民, 獲得30分',
             'flash_message_switch' => 1,
             'user_id' => 1,
             'group_id' => 1
@@ -85,7 +85,7 @@ class BulletinSeeder extends Seeder
 
         $bulletin = Bulletin::create([
             'type' => 'flash_message',
-            'content' => 'content H',
+            'content' => '劉康港 網路新住民, 獲得30分',
             'flash_message_switch' => 0,
             'user_id' => 1,
             'group_id' => 1
@@ -93,7 +93,7 @@ class BulletinSeeder extends Seeder
 
         $bulletin = Bulletin::create([
             'type' => 'flash_message',
-            'content' => 'content I',
+            'content' => '陳柏綸 十個100分！, 獲得18分',
             'flash_message_switch' => 0,
             'user_id' => 1,
             'group_id' => 1
@@ -101,7 +101,7 @@ class BulletinSeeder extends Seeder
 
         $bulletin = Bulletin::create([
             'type' => 'flash_message',
-            'content' => 'content J',
+            'content' => '曾理碩 十個100分！, 獲得18分',
             'flash_message_switch' => 0,
             'user_id' => 1,
             'group_id' => 1

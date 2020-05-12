@@ -268,9 +268,9 @@ class ProfileController extends Controller
                 $task->confirmed_at_timestamp = $task->confirmed_at->getTimestamp();
                 if($task->confirmed_at_timestamp >= $startedDateTimestamp){
                     $periodScore += $task->score;
-                    $completeTasksInThisPeriod[] = '完成'.$task->name.'獲得'.$task->score.'分';
+                    $completeTasksInThisPeriod[] = '完成 '.$task->name.', 獲得'.$task->score.'分';
                 } else{
-                    $completeTasksInThePast[] = '完成'.$task->name.'獲得'.$task->score.'分';
+                    $completeTasksInThePast[] = '完成 '.$task->name.', 獲得'.$task->score.'分';
                 }
                 $allScore += $task->score;
             }

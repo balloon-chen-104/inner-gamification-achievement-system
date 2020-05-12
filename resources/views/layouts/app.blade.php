@@ -101,7 +101,8 @@
                         <li>
                             <a class="article" href="{{ route('logout') }}"
                                 onclick="event.preventDefault();
-                                                document.getElementById('logout-form').submit();">
+                                document.getElementById('logout-form').submit();"
+                                dusk="logout-btn">
                                 {{ __('登出') }}
                             </a>
 
@@ -160,7 +161,7 @@
                                     </li>
                                     <li class="nav-item dropdown">
                                         <a class="nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">{{ __('任務') }}</a>
-                                        <div class="dropdown-menu">
+                                        <div class="dropdown-menu upup">
                                             <a class="dropdown-item" href="{{route('task.index')}}">所有任務</a>
                                             <a class="dropdown-item" href="{{route('task.history')}}">過去的任務</a>
                                             <div class="dropdown-divider"></div>
@@ -170,6 +171,7 @@
                                             @else
                                                 <a class="dropdown-item" href="{{route('task.propose')}}">提案新任務</a>
                                             @endif
+                                        </div>
                                     </li>
                                     <li class="nav-item">
                                         <a class="nav-link" href="/leaderboard">{{ __('英雄榜') }}</a>
@@ -227,3 +229,9 @@
 
 </body>
 </html>
+
+<style>
+    .upup {
+        margin-top: -2px;
+    }
+</style>
