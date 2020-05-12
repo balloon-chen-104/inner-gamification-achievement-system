@@ -30,7 +30,7 @@ cache:
     - vendor
 
 before_deploy:
-  - sed -in-place 's/localhost/www.gameachieve.net/g; 1s/Laravel/"遊戲化成就系統"/g; s/http/https/g' .env.example
+  - sed -in-place 's/localhost/www.gameachieve.net/g; s/http/https/g' .env.example
   - sed -in-place "23s|$|$AZURE_KEY|" .env.example
   - sed -in-place "24s|$|$AZURE_SECRET|" .env.example
   - rm .env.examplen-place
