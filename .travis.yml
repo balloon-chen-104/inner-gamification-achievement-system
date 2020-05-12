@@ -34,7 +34,6 @@ before_deploy:
   - sed -in-place "23s|$|$AZURE_KEY|" .env.example
   - sed -in-place "23s|$|$AZURE_SECRET|" .env.example
   - rm .env.examplen-place
-  - mv .env.example .env
   - rm -r laradock/
 deploy:
   provider: elasticbeanstalk
