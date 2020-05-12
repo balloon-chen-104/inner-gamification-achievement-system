@@ -62,6 +62,8 @@ function approveSuggestionTask(e, id, confirmed){
                             </tbody>
                         </table>
                     `)
+                    // solve the problem that the above tbody add an extra td.
+                    $(`#edit-task-${task.id}`).children(':last').detach();
                 }
                 $('.card-body:eq(3)').slideDown();
             } else {

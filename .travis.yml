@@ -1,7 +1,6 @@
 dist: bionic
 language: php
 php:
-  - 7.2
   - 7.3
 
 branch:
@@ -29,3 +28,23 @@ cache:
     - node_modules
     - "$HOME/.composer/cache/files"
     - vendor
+
+before_deploy:
+  - sed -in-place 's/localhost/www.gameachieve.net/g; 1s/Laravel/遊戲化成就系統/g' .env.example
+  - sed -in-place "23s|$|$AZURE_KEY|" .env.example
+  - sed -in-place "24s|$|$AZURE_SECRET|" .env.example
+  - rm .env.examplen-place
+  - rm -r laradock/
+deploy:
+  provider: elasticbeanstalk
+  edge: true
+  skip_cleanup: true
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key: $AWS_SECRET_KEY
+  region: "us-west-2"
+  app: "gamification-achievement-system"
+  env: "GamificationAchievementSystem-env"
+  bucket_name: "elasticbeanstalk-us-west-2-514451421785"
+
+after_deploy:
+  - echo "done deploying"

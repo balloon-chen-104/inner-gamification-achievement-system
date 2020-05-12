@@ -116,7 +116,7 @@
                 <div class="card-header" style="cursor: pointer" onclick="$('.card-body:eq(2)').slideToggle();">已通過的提案任務</div>
                 <div class="card-body" style="display:none">
                     @if ($tasks->get('passed_tasks')->count() > 0)
-                        <table class="table table-hover" id="current-task">
+                        <table class="table table-hover" id="passed-task">
                             <thead class="thead-light">
                                 <tr>
                                     <th scope="col">任務名</th>
